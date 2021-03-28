@@ -14,6 +14,14 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
+#for generating data
+import csv
+import time
+#for ploting as cine
+from itertools import count
+import pandas as pd
+from matplotlib.animation import FuncAnimation
+
 class Ui_MainWindow(QWidget):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
@@ -27,6 +35,8 @@ class Ui_MainWindow(QWidget):
 
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
         self.tabWidget.setGeometry(QtCore.QRect(0, 0, 911, 581))
+
+
         self.tabWidget.setObjectName("tabWidget")
 
                      
@@ -81,20 +91,93 @@ class Ui_MainWindow(QWidget):
         self.CreateGraph(Time, Magnitude, FileName)
     
     def CreateGraph(self, time, magnitude, name):
+
         # Data for plotting
-        fig, graph = plt.subplots()
-        graph.plot(time, magnitude)
+        self.Gen_CSVFile(time,magnitude)
 
-        graph.set(xlabel='Time', ylabel='Magnitude', title=name)
-        graph.grid()
+        # plot as cine
+        x_vals = []
+        y_vals = []
 
+        index = count(time[0],.00025)
+        def animate(i):
+            data = pd.read_csv('data.csv')
+            x = data['x_value']
+            y1 = data['total_1']
+            
+
+            plt.cla()
+
+            plt.plot(x, y1, label='magnitude')
+            plt.xlabel('Time')
+            plt.ylabel('Madnitude')
+            plt.title(name)
+            
+            #plt.ylim(-1.2,1.2)
+            
+            plt.xlim(next(index)-.002,next(index)+0.00025)
+                
+            
+
+
+
+
+            plt.legend(loc='upper left')
+            plt.tight_layout()
+        ani = FuncAnimation(plt.gcf(), animate, interval=1000)
+    
+
+        plt.tight_layout()
         plt.show()
+
+        # fig, graph = plt.subplots()
+        # graph.plot(time, magnitude)
+
+        # graph.set(xlabel='Time', ylabel='Magnitude', title=name)
+        # graph.grid()
+
+        # plt.show()
 
     def open_dialog_box(self):
         filename = QFileDialog.getOpenFileName()
         path = filename[0]
         return path
+    
 
+    def Gen_CSVFile(self,Time, magnitude):
+
+        fieldnames = ["x_value", "total_1"]
+        x_value = 0
+        total_1 = 0
+        with open('data.csv', 'w') as csv_file:
+            csv_writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+            csv_writer.writeheader()
+
+        i=0
+        while True:
+
+            with open('data.csv', 'a') as csv_file:
+                csv_writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+
+                info = {
+                    "x_value": x_value,
+                    "total_1": total_1,
+                }
+
+                csv_writer.writerow(info)
+                # print(x_value, total_1)
+
+                if i<len(Time):
+                    x_value =Time[i]
+                    total_1 = magnitude[i]
+                else:
+                    return
+                
+            i+=1
+            #time.sleep(1)
+
+    
+    
 
 
 if __name__ == "__main__":
