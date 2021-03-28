@@ -20,9 +20,9 @@ class Ui_MainWindow(QWidget):
         MainWindow.resize(908, 585)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-        layout=QHBoxLayout()
+        """layout=QHBoxLayout()
         layout.addWidget(self.centralwidget)
-        
+        """
         
 
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
@@ -45,8 +45,7 @@ class Ui_MainWindow(QWidget):
         self.PDFEditor.setObjectName("PDFEditor")
         self.tabWidget.addTab(self.PDFEditor, "")
         
-        self.setLayout(layout)
-        #MainWindow.setCentralWidget(self.centralwidget)
+        MainWindow.setCentralWidget(self.centralwidget)
 
 
         self.retranslateUi(MainWindow)
