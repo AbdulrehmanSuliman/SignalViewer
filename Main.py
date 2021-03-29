@@ -8,7 +8,7 @@ class MyWindow(QMainWindow):
         super(MyWindow, self).__init__()
         self.setGeometry(200, 200, 500, 500)
         self.setWindowTitle("Signal Viewer")
-        self.initUI()
+       self.initUI()
 
     def initUI(self):
         self.label = QtWidgets.QLabel(self)

@@ -22,31 +22,59 @@ from itertools import count
 import pandas as pd
 from matplotlib.animation import FuncAnimation
 
+import sys
+import matplotlib
+matplotlib.use('Qt5Agg')
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg
+
+from matplotlib.figure import Figure
+
+class MplCanvas(FigureCanvasQTAgg):
+
+    def __init__(self, parent=None, width=5, height=4, dpi=100):
+        fig = Figure(figsize=(width, height), dpi=dpi)
+        self.axes = fig.add_subplot(111)
+        super(MplCanvas, self).__init__(fig)
+
 class Ui_MainWindow(QWidget):
+
     def setupUi(self, MainWindow):
+
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(908, 585)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
+
+        
+        self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
+        self.tabWidget.setGeometry(QtCore.QRect(0, 0, 911, 581))
+        self.tabWidget.setObjectName("tabWidget")
+        
+        self.SignalViewer = QtWidgets.QWidget()
+        self.SignalViewer.setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
+        self.SignalViewer.setObjectName("SignalViewer")
+
+        
+        
+        
+
+        
+        
+        
+
         """layout=QHBoxLayout()
         layout.addWidget(self.centralwidget)
         """
         
 
-        self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
-        self.tabWidget.setGeometry(QtCore.QRect(0, 0, 911, 581))
-
-
-        self.tabWidget.setObjectName("tabWidget")
+        
 
                      
-        self.SignalViewer = QtWidgets.QWidget()
-        self.SignalViewer.setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
-        self.SignalViewer.setObjectName("SignalViewer")
+        
 
 
         self.BrowseFile = QtWidgets.QPushButton(self.SignalViewer)
-        self.BrowseFile.setGeometry(QtCore.QRect(200, 130, 501, 251))
+        self.BrowseFile.setGeometry(QtCore.QRect(10, 10, 200, 100))
         self.BrowseFile.setObjectName("BrowseFile")        
         self.tabWidget.addTab(self.SignalViewer, "")
 
@@ -90,6 +118,7 @@ class Ui_MainWindow(QWidget):
         Time, Magnitude = np.loadtxt(path,unpack=True)
         self.CreateGraph(Time, Magnitude, FileName)
     
+
     def CreateGraph(self, time, magnitude, name):
 
         # Data for plotting
