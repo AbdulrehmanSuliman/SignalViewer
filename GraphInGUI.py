@@ -30,7 +30,8 @@ class MyMplCanvas(FigureCanvas):
 
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         fig = Figure(figsize=(width, height), dpi=dpi)
-        self.axes = fig.add_subplot(111)
+        self.axes = fig.add_subplot(211)
+        self.Spectro = fig.add_subplot(212)
 
         self.compute_initial_figure()
 
@@ -93,7 +94,10 @@ class MyDynamicMplCanvas(MyMplCanvas):
             self.axes.plot(self.Time[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], self.Magnitude[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], 'r')
         else:
             self.axes.plot(self.Time[self.CountIn:self.CountOut], self.Magnitude[self.CountIn:self.CountOut], 'r')
-
+        
+        self.Spectro.cla()
+        self.Spectro.specgram(self.Magnitude[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], Fs=100)
+        
         if self.IsStop :
             self.CountOut += 1
             if self.CountOut - self.CountIn >= self.CountRange :
@@ -104,7 +108,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
     def SetZoomFactor(self,zoomed):
         if zoomed:
             self.ZoomFactor=self.ZoomFactor*0.5
-"""            self.CountOut = math.ceil(0.9* self.CountRange)"""
+# """            self.CountOut = math.ceil(0.9* self.CountRange)"""
             self.IsZoomed=True
         else:
             self.ZoomFactor=self.ZoomFactor+0.5*(1-self.ZoomFactor)
