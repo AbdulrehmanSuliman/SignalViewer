@@ -54,12 +54,17 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.IsStop=True
         self.ZoomFactor = 200
         self.IsZoomed=False
+        self.scrollDisplacement=0
 
     def SetIsStop(self):
         if self.IsStop:   
             self.IsStop=False
         else:
             self.IsStop=True
+
+    def SetScrollDisplacement(self,movedValue):
+        self.scrollDisplacement+=movedValue
+
 
     def SetTimer(self):
         self.CountIn = 0
@@ -74,9 +79,12 @@ class MyDynamicMplCanvas(MyMplCanvas):
 
     def update_figure(self):
         self.axes.cla()
-        self.axes.plot(self.Time[self.CountIn:self.CountOut], self.Magnitude[self.CountIn:self.CountOut], 'r')
-        print(self.ZoomFactor)
-        if self.IsStop:
+        if self.CountIn+self.scrollDisplacement>= 0:
+            self.axes.plot(self.Time[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], self.Magnitude[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], 'r')
+        else:
+            self.axes.plot(self.Time[self.CountIn:self.CountOut], self.Magnitude[self.CountIn:self.CountOut], 'r')
+
+        if self.IsStop :
             self.CountOut += 1
             if self.CountOut - self.CountIn >= self.ZoomFactor :
                 self.CountIn += 1
@@ -112,10 +120,17 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         #self.tools_menu.addAction('continue signal', self.ConSignal, QtCore.Qt.CTRL + QtCore.Qt.Key_C)
         self.menuBar().addMenu(self.tools_menu)
 
+        self.scroll_menu = QtWidgets.QMenu('Scroll', self)
+        self.scroll_menu.addAction('Move Right', self.MoveRight, QtCore.Qt.CTRL + QtCore.Qt.Key_R)
+        self.scroll_menu.addAction('Move Left', self.MoveLeft, QtCore.Qt.CTRL + QtCore.Qt.Key_L)
+        self.menuBar().addMenu(self.scroll_menu)
+
         self.help_menu = QtWidgets.QMenu('Help', self)
         #self.menuBar().addSeparator()
         self.menuBar().addMenu(self.help_menu)
         self.help_menu.addAction('&About', self.about)
+
+        
 
         self.main_widget = QtWidgets.QWidget(self)
 
@@ -144,6 +159,12 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.DynamicGraph.SetZoomFactor(True)
     def ZoomOut(self):
         self.DynamicGraph.SetZoomFactor(False)
+
+    def MoveRight(self):
+        self.DynamicGraph.SetScrollDisplacement(100)
+    def MoveLeft(self):
+        self.DynamicGraph.SetScrollDisplacement(-100)
+
 
     def about(self):
         QtWidgets.QMessageBox.about(self, "About", """sifjsjm""")
