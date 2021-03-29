@@ -23,6 +23,7 @@ import numpy as np
 from numpy import arange, sin, pi
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+import math
 
 class MyMplCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
@@ -52,8 +53,9 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.CountOut = 0
         self.CountIn = 0
         self.IsStop=True
-        self.ZoomFactor = 200
+        self.ZoomFactor = 1
         self.IsZoomed=False
+        self.CountRange = 200
 
     def SetIsStop(self):
         if self.IsStop:   
@@ -71,14 +73,15 @@ class MyDynamicMplCanvas(MyMplCanvas):
     def SetTimeAndMagnitude(self, time, magnitude):
         self.Time = time
         self.Magnitude = magnitude
+        print(self.Time)
 
     def update_figure(self):
         self.axes.cla()
+        self.axes.margins(x=self.ZoomFactor , y=self.ZoomFactor)
         self.axes.plot(self.Time[self.CountIn:self.CountOut], self.Magnitude[self.CountIn:self.CountOut], 'r')
-        print(self.ZoomFactor)
         if self.IsStop:
             self.CountOut += 1
-            if self.CountOut - self.CountIn >= self.ZoomFactor :
+            if self.CountOut - self.CountIn >= self.CountRange :
                 self.CountIn += 1
 
         self.draw()
@@ -86,10 +89,16 @@ class MyDynamicMplCanvas(MyMplCanvas):
     def SetZoomFactor(self,zoomed):
         if zoomed:
             self.ZoomFactor=self.ZoomFactor*0.5
+"""            self.CountOut = math.ceil(0.9* self.CountRange)"""
             self.IsZoomed=True
         else:
-            self.ZoomFactor=self.ZoomFactor*2
+            self.ZoomFactor=self.ZoomFactor+0.5*(1-self.ZoomFactor)
+            """self.CountOut = math.ceil(2*self.CountRange)
+            self.CountIn = self.CountIn - (self.CountRange - (self.CountOut - self.CountIn))
+            if (self.CountIn<0):
+                self.CountIn = 0"""
             self.IsZoomed=False
+            
 
 class ApplicationWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -105,9 +114,8 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
         self.tools_menu = QtWidgets.QMenu('Tools', self)
         self.tools_menu.addAction('Stop signal', self.stopSignal,QtCore.Qt.Key_Space)
-        self.tools_menu.addAction('ZoomIn', self.ZoomIn,QtCore.Qt.Key_Z)
-
-        self.tools_menu.addAction('ZoomOut', self.ZoomOut,QtCore.Qt.Key_O)
+        self.tools_menu.addAction('Zoom in', self.ZoomIn,QtCore.Qt.Key_Z)
+        self.tools_menu.addAction('Zoom out', self.ZoomOut,QtCore.Qt.Key_O)
         
         #self.tools_menu.addAction('continue signal', self.ConSignal, QtCore.Qt.CTRL + QtCore.Qt.Key_C)
         self.menuBar().addMenu(self.tools_menu)
