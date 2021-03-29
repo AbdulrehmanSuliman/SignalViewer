@@ -53,6 +53,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.CountIn = 0
         self.IsStop=True
         self.ZoomFactor = 200
+        self.IsZoomed=False
 
     def SetIsStop(self):
         if self.IsStop:   
@@ -74,15 +75,21 @@ class MyDynamicMplCanvas(MyMplCanvas):
     def update_figure(self):
         self.axes.cla()
         self.axes.plot(self.Time[self.CountIn:self.CountOut], self.Magnitude[self.CountIn:self.CountOut], 'r')
+        print(self.ZoomFactor)
         if self.IsStop:
             self.CountOut += 1
-            if self.CountOut - self.CountIn >= 200 :
+            if self.CountOut - self.CountIn >= self.ZoomFactor :
                 self.CountIn += 1
 
         self.draw()
 
-    """def SetZoomFactor(self):
-        self.axes.margins(x=0,y=0.25)"""
+    def SetZoomFactor(self,zoomed):
+        if zoomed:
+            self.ZoomFactor=self.ZoomFactor*0.5
+            self.IsZoomed=True
+        else:
+            self.ZoomFactor=self.ZoomFactor*2
+            self.IsZoomed=False
 
 class ApplicationWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -99,6 +106,9 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.tools_menu = QtWidgets.QMenu('Tools', self)
         self.tools_menu.addAction('Stop signal', self.stopSignal,QtCore.Qt.Key_Space)
         self.tools_menu.addAction('ZoomIn', self.ZoomIn,QtCore.Qt.Key_Z)
+
+        self.tools_menu.addAction('ZoomOut', self.ZoomOut,QtCore.Qt.Key_O)
+        
         #self.tools_menu.addAction('continue signal', self.ConSignal, QtCore.Qt.CTRL + QtCore.Qt.Key_C)
         self.menuBar().addMenu(self.tools_menu)
 
@@ -131,7 +141,9 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.DynamicGraph.SetIsStop()
         
     def ZoomIn(self):
-        self.DynamicGraph.SetZoomFactor()
+        self.DynamicGraph.SetZoomFactor(True)
+    def ZoomOut(self):
+        self.DynamicGraph.SetZoomFactor(False)
 
     def about(self):
         QtWidgets.QMessageBox.about(self, "About", """sifjsjm""")
@@ -166,6 +178,8 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
 qApp = QtWidgets.QApplication(sys.argv)
 aw = ApplicationWindow()
-#aw.setWindowTitle("%s" % progname)
+#
+# 
+# aw.setWindowTitle("%s" % progname)
 aw.show()
 sys.exit(qApp.exec_())
