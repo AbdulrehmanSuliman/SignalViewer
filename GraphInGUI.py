@@ -17,13 +17,19 @@ import matplotlib
 # Make sure that we are using QT5
 matplotlib.use('Qt5Agg')
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QInputDialog, QFileDialog
+from PyQt5.QtWidgets import QInputDialog, QFileDialog, QApplication
 
+from PyQt5.QtGui import *
+from PIL import Image
 import numpy as np
 from numpy import arange, sin, pi
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import math
+from reportlab.pdfgen import canvas 
+
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfbase import pdfmetrics
 
 class MyMplCanvas(FigureCanvas):
     """Ultimately, this is a QWidget (as well as a FigureCanvasAgg, etc.)."""
@@ -121,6 +127,8 @@ class MyDynamicMplCanvas(MyMplCanvas):
 
 class ApplicationWindow(QtWidgets.QMainWindow):
     def __init__(self):
+        self.fname=""
+        self.ImageList=[]
         QtWidgets.QMainWindow.__init__(self)
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setWindowTitle("application main window")
@@ -128,6 +136,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.file_menu = QtWidgets.QMenu('File', self)
         self.file_menu.addAction('Browse File', self.SelectFile, QtCore.Qt.CTRL + QtCore.Qt.Key_B)
         self.file_menu.addAction('Add To PDF', self.AddToPDF, QtCore.Qt.CTRL + QtCore.Qt.Key_D)
+        self.file_menu.addAction('Create PDF', self.CreatePDF, QtCore.Qt.CTRL + QtCore.Qt.Key_P)
         self.file_menu.addAction('Quit', self.fileQuit, QtCore.Qt.CTRL + QtCore.Qt.Key_Q)
         self.menuBar().addMenu(self.file_menu)
 
@@ -148,6 +157,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         #self.menuBar().addSeparator()
         self.menuBar().addMenu(self.help_menu)
         self.help_menu.addAction('&About', self.about)
+        
 
         
 
@@ -196,24 +206,102 @@ class ApplicationWindow(QtWidgets.QMainWindow):
     def SelectFile(self):
         path = self.open_dialog_box()
         print(path)
-
-        FileName = ""
         i=0
+        FileName = ""
         while path[i] != "." or path[i+1] != "t" or path[i+2] != "x" or path[i+3] != "t":
             if path[i] == '/':
                 FileName =""
             else:
                 FileName = FileName + path[i]
             i=i+1
-
-        Time, Araf, Magnitude = np.loadtxt(path,unpack=True)
+        self.fname=FileName
+        Time,trash, Magnitude = np.loadtxt(path,unpack=True)
 
         self.DynamicGraph.SetTimeAndMagnitude(Time, Magnitude)
         self.DynamicGraph.SetTimer()
 
-
     def AddToPDF(self):
-        print("afeverd")
+        screen=QtWidgets.QApplication.primaryScreen()
+        screenshot=screen.grabWindow(self.winId())
+        screenshot.save('photo.jpg','jpg')
+        im = Image.open("photo.jpg")
+        width, height = im.size
+        left = 10
+        top = height/8
+        right = 500
+        bottom = 3.75 * height / 4
+        im1 = im.crop((left, top, right, bottom))
+        newsize = (220, 220)
+        im1 = im1.resize(newsize)
+        self.ImageList.append(im1)
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+            
+        
+    
+    def CreatePDF(self):
+        fileName = 'Report.pdf'
+        documentTitle = 'Report'
+        pdf = canvas.Canvas(fileName)
+        pdf.setTitle(documentTitle)
+        pdfmetrics.registerFont( TTFont('abc', 'SakBunderan.ttf') )
+        pdf.setFont('abc', 36)
+        pdf.drawCentredString(300, 770, 'Report')   #title
+
+
+
+        # pdf.drawString(100,810, 'x100')
+        # pdf.drawString(200,810, 'x200')
+        # pdf.drawString(300,810, 'x300')
+        # pdf.drawString(400,810, 'x400')
+        # pdf.drawString(500,810, 'x500')
+
+        # pdf.drawString(10,100, 'y100')
+        # pdf.drawString(10,200, 'y200')
+        # pdf.drawString(10,300, 'y300')
+        # pdf.drawString(10,400, 'y400')
+        # pdf.drawString(10,500, 'y500')
+        # pdf.drawString(10,600, 'y600')
+        # pdf.drawString(10,700, 'y700')
+        # pdf.drawString(10,800, 'y800')
+        #EEEEEEEEEECCCCCCCCCCCCGGGGGGGGGG
+        pdf.setFillColorRGB(0, 0, 0)    #subtitle
+        pdf.setFont("Courier-Bold", 14)
+        pdf.drawString(70,720, "ECG")
+        pdf.drawString(350,670, "Notes:-")
+        # pdf.line(70, 715, 140, 715)
+        pdf.drawInlineImage(self.ImageList[0],70, 490)
+        #EEEEEEEEEEEEEEEEEEGGGGGGGGGGGGGGGG
+        pdf.setFillColorRGB(0, 0, 0)    #subtitle
+        pdf.setFont("Courier-Bold", 14)
+        pdf.drawString(350,460, "EEG")
+        pdf.drawString(100,400, "Notes:-")
+        # pdf.line(300, 455, 300, 455)
+        pdf.drawInlineImage(self.ImageList[1],300, 220)
+        #EEEEEEEEEEEEMMMMMMMMMMMMMMGGGGGGGGG
+        pdf.setFillColorRGB(0, 0, 0)    #subtitle
+        pdf.setFont("Courier-Bold", 14)
+        pdf.drawString(70,230, "EMG")
+        pdf.drawString(350,150, "Notes:-")
+        # pdf.line(70, 195, 140, 195)
+        pdf.drawInlineImage(self.ImageList[2],70, 0)
+
+
+
+        pdf.save()
+
+
+
+        
+
 
 
 qApp = QtWidgets.QApplication(sys.argv)
