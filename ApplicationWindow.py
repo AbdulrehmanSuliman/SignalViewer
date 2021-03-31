@@ -12,10 +12,11 @@ from reportlab.pdfbase import pdfmetrics
 
 class ApplicationWindow(QtWidgets.QMainWindow):
     def __init__(self):
+        QtWidgets.QMainWindow.__init__(self)
         self.fname=""
         self.ImageList=[]
         self.GraphsInPDF = 0
-        QtWidgets.QMainWindow.__init__(self)
+
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setWindowTitle("application main window")
 
@@ -54,12 +55,10 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
     def stopSignal(self):
         self.DynamicGraph.SetIsStop()
-
-    def ConSignal(self):
-        self.DynamicGraph.SetIsStop()
         
     def ZoomIn(self):
         self.DynamicGraph.SetZoomFactor(True)
+
     def ZoomOut(self):
         self.DynamicGraph.SetZoomFactor(False)
 
@@ -106,13 +105,15 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         im1 = im1.resize(newsize)
         if self.GraphsInPDF == 0:
             imagedata = [im1, 70, 490, 70,720, 350,670, self.fname]
+            self.ImageList.append(imagedata)
         elif self.GraphsInPDF == 1:
             imagedata = [im1,300, 220, 350, 460, 100, 400, self.fname]
+            self.ImageList.append(imagedata)
         elif self.GraphsInPDF == 2:
             imagedata = [im1,70, 0, 70, 230, 350,150, self.fname]
+            self.ImageList.append(imagedata)
         
         self.GraphsInPDF+=1
-        self.ImageList.append(imagedata)
         
         
     def CreatePDF(self):

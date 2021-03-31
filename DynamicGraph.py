@@ -67,6 +67,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
 
     def update_figure(self):
         self.axes.cla()
+
         if self.IsStop:
             self.CountOut += 1
             if self.CountOut - self.CountIn >= self.CountRange :
@@ -74,15 +75,13 @@ class MyDynamicMplCanvas(MyMplCanvas):
 
         if self.CountIn+self.scrollDisplacement>= 0 and self.CountIn+self.scrollDisplacement <= self.CountOut:
             self.axes.plot(self.Time[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], self.Magnitude[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], 'r')
-            print(self.scrollDisplacement)
         else:
             if self.scrollDisplacement>0:
                 self.scrollDisplacement-=50
             if self.scrollDisplacement<0:
                 self.scrollDisplacement+=50
+            self.axes.plot(self.Time[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], self.Magnitude[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], 'r')
             #self.axes.plot(self.Time[self.CountIn:self.CountOut], self.Magnitude[self.CountIn:self.CountOut], 'r')
-            print()
-            print(self.scrollDisplacement)
         
         self.Spectro.cla()
         self.Spectro.specgram(self.Magnitude[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], Fs=100)
@@ -91,15 +90,12 @@ class MyDynamicMplCanvas(MyMplCanvas):
 
     def SetZoomFactor(self,zoomed):
         if zoomed:
-            self.ZoomFactor=self.ZoomFactor*0.5
             self.CountIn = self.CountIn + ceil( 0.5*(self.CountOut - self.CountIn) )
+            self.CountRange = self.CountOut - self.CountIn
             self.IsZoomed=True
         else:
-            self.ZoomFactor=self.ZoomFactor+0.5*(1-self.ZoomFactor)
-            ExpandedCurrentRange = self.CountOut - self.CountIn + 50
-
             self.CountIn = self.CountIn - 50
+            self.CountRange = self.CountOut - self.CountIn
             if (self.CountIn<0):
                 self.CountIn = 0
-
             self.IsZoomed=False
