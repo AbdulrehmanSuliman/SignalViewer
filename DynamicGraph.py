@@ -45,16 +45,22 @@ class MyDynamicMplCanvas(MyMplCanvas):
             self.IsStop=True
 
     def SetScrollDisplacement(self,movedValue):
+
         self.scrollDisplacement+=movedValue
 
     def SetTimer(self):
-        self.CountIn = 0
-        self.CountOut = 0
         timer = QtCore.QTimer(self)
         timer.timeout.connect(self.update_figure)
         timer.start(1)
 
     def SetTimeAndMagnitude(self, time, magnitude):
+        self.CountOut = 0
+        self.CountIn = 0
+        self.scrollDisplacement=0
+        self.IsStop=True
+        self.ZoomFactor = 0.05
+        self.IsZoomed=False
+        self.CountRange = 200
         self.Time = time
         self.Magnitude = magnitude
         print(self.Time)
@@ -66,10 +72,17 @@ class MyDynamicMplCanvas(MyMplCanvas):
             if self.CountOut - self.CountIn >= self.CountRange :
                 self.CountIn += 1
 
-        if self.CountIn+self.scrollDisplacement>= 0:
+        if self.CountIn+self.scrollDisplacement>= 0 and self.CountIn+self.scrollDisplacement <= self.CountOut:
             self.axes.plot(self.Time[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], self.Magnitude[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], 'r')
+            print(self.scrollDisplacement)
         else:
-            self.axes.plot(self.Time[self.CountIn:self.CountOut], self.Magnitude[self.CountIn:self.CountOut], 'r')
+            if self.scrollDisplacement>0:
+                self.scrollDisplacement-=50
+            if self.scrollDisplacement<0:
+                self.scrollDisplacement+=50
+            #self.axes.plot(self.Time[self.CountIn:self.CountOut], self.Magnitude[self.CountIn:self.CountOut], 'r')
+            print()
+            print(self.scrollDisplacement)
         
         self.Spectro.cla()
         self.Spectro.specgram(self.Magnitude[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], Fs=100)

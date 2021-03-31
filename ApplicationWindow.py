@@ -26,10 +26,10 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
         self.tools_menu = QtWidgets.QMenu('Tools', self)
         self.tools_menu.addAction('Stop/Play signal', self.stopSignal,QtCore.Qt.Key_Space)
-        self.tools_menu.addAction('Zoom in', self.ZoomIn,QtCore.Qt.Key_Plus)
-        self.tools_menu.addAction('Zoom out', self.ZoomOut,QtCore.Qt.Key_Minus)
+        self.tools_menu.addAction('Zoom in', self.ZoomIn, QtCore.Qt.CTRL + QtCore.Qt.Key_Z)
+        self.tools_menu.addAction('Zoom out', self.ZoomOut, QtCore.Qt.CTRL + QtCore.Qt.SHIFT + QtCore.Qt.Key_Z)
         self.tools_menu.addAction('Move Right', self.MoveRight, QtCore.Qt.CTRL + QtCore.Qt.Key_R)
-        self.tools_menu.addAction('Move Left', self.MoveLeft, QtCore.Qt.CTRL + QtCore.Qt.Key_Shift + QtCore.Qt.Key_R)
+        self.tools_menu.addAction('Move Left', self.MoveLeft, QtCore.Qt.CTRL + QtCore.Qt.Key_L)
         self.menuBar().addMenu(self.tools_menu)
 
         self.pdf_menu = QtWidgets.QMenu('PDF', self)
@@ -64,9 +64,9 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.DynamicGraph.SetZoomFactor(False)
 
     def MoveRight(self):
-        self.DynamicGraph.SetScrollDisplacement(100)
+        self.DynamicGraph.SetScrollDisplacement(50)
     def MoveLeft(self):
-        self.DynamicGraph.SetScrollDisplacement(-100)
+        self.DynamicGraph.SetScrollDisplacement(-50)
     
     def open_dialog_box(self):
         filename = QFileDialog.getOpenFileName()
@@ -75,7 +75,8 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
     def SelectFile(self):
         path = self.open_dialog_box()
-        print(path)
+        if path == "":
+            return
         i=0
         FileName = ""
         while path[i] != "." or path[i+1] != "t" or path[i+2] != "x" or path[i+3] != "t":
@@ -104,11 +105,11 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         newsize = (220, 220)
         im1 = im1.resize(newsize)
         if self.GraphsInPDF == 0:
-            imagedata = [im1, 70, 490]
+            imagedata = [im1, 70, 490, 70,720, 350,670, self.fname]
         elif self.GraphsInPDF == 1:
-            imagedata = [im1,300, 220]
+            imagedata = [im1,300, 220, 350, 460, 100, 400, self.fname]
         elif self.GraphsInPDF == 2:
-            imagedata = [im1,70, 0]
+            imagedata = [im1,70, 0, 70, 230, 350,150, self.fname]
         
         self.GraphsInPDF+=1
         self.ImageList.append(imagedata)
@@ -123,12 +124,11 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         pdf.setFont('abc', 36)
         pdf.drawCentredString(300, 770, 'Report')   #title
 
-        for image,xcord,ycord in self.ImageList:
-            print(xcord)  
+        for image,imgxcord,imgycord, namexcord, nameycord, notesxcord, notesycord, GraphName in self.ImageList:  
             pdf.setFillColorRGB(0, 0, 0)    #subtitle
             pdf.setFont("Courier-Bold", 14)
-            pdf.drawString(70,720, self.fname)
-            pdf.drawString(350,670, "Notes:-")
-            pdf.drawInlineImage(image,xcord, ycord)
+            pdf.drawString(namexcord, nameycord, GraphName)
+            pdf.drawString(notesxcord, notesycord, "Notes:-")
+            pdf.drawInlineImage(image,imgxcord, imgycord)
 
         pdf.save()
