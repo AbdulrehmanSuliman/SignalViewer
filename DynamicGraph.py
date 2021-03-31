@@ -74,8 +74,6 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.Spectro.cla()
         self.Spectro.specgram(self.Magnitude[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], Fs=100)
         
-        #self.axes.margins(x=self.ZoomFactor , y=self.ZoomFactor)
-        self.axes.plot(self.Time[self.CountIn:self.CountOut], self.Magnitude[self.CountIn:self.CountOut], 'r')
         self.draw()
 
     def SetZoomFactor(self,zoomed):

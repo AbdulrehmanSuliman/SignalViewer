@@ -20,21 +20,21 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.setWindowTitle("application main window")
 
         self.file_menu = QtWidgets.QMenu('File', self)
-        self.file_menu.addAction('Browse File', self.SelectFile, QtCore.Qt.CTRL + QtCore.Qt.Key_B)
+        self.file_menu.addAction('Open File', self.SelectFile, QtCore.Qt.CTRL + QtCore.Qt.Key_O)
         self.file_menu.addAction('Quit', self.fileQuit, QtCore.Qt.CTRL + QtCore.Qt.Key_Q)
         self.menuBar().addMenu(self.file_menu)
 
         self.tools_menu = QtWidgets.QMenu('Tools', self)
         self.tools_menu.addAction('Stop/Play signal', self.stopSignal,QtCore.Qt.Key_Space)
-        self.tools_menu.addAction('Zoom in', self.ZoomIn,QtCore.Qt.Key_Z)
-        self.tools_menu.addAction('Zoom out', self.ZoomOut,QtCore.Qt.Key_O)
+        self.tools_menu.addAction('Zoom in', self.ZoomIn,QtCore.Qt.Key_Plus)
+        self.tools_menu.addAction('Zoom out', self.ZoomOut,QtCore.Qt.Key_Minus)
         self.tools_menu.addAction('Move Right', self.MoveRight, QtCore.Qt.CTRL + QtCore.Qt.Key_R)
-        self.tools_menu.addAction('Move Left', self.MoveLeft, QtCore.Qt.CTRL + QtCore.Qt.Key_L)
+        self.tools_menu.addAction('Move Left', self.MoveLeft, QtCore.Qt.CTRL + QtCore.Qt.Key_Shift + QtCore.Qt.Key_R)
         self.menuBar().addMenu(self.tools_menu)
 
         self.pdf_menu = QtWidgets.QMenu('PDF', self)
-        self.pdf_menu.addAction('Add To PDF', self.AddToPDF, QtCore.Qt.CTRL + QtCore.Qt.Key_D)
-        self.pdf_menu.addAction('Create PDF', self.CreatePDF, QtCore.Qt.CTRL + QtCore.Qt.Key_P)
+        self.pdf_menu.addAction('Add To PDF', self.AddToPDF, QtCore.Qt.CTRL + QtCore.Qt.Key_P)
+        self.pdf_menu.addAction('Create PDF', self.CreatePDF, QtCore.Qt.CTRL + QtCore.Qt.SHIFT + QtCore.Qt.Key_P)
         self.menuBar().addMenu(self.pdf_menu)
 
         self.main_widget = QtWidgets.QWidget(self)
@@ -129,7 +129,6 @@ class ApplicationWindow(QtWidgets.QMainWindow):
             pdf.setFont("Courier-Bold", 14)
             pdf.drawString(70,720, self.fname)
             pdf.drawString(350,670, "Notes:-")
-            # pdf.line(70, 715, 140, 715)
             pdf.drawInlineImage(image,xcord, ycord)
 
         pdf.save()
