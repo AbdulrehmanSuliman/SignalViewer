@@ -85,7 +85,8 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.CountRange = 200
         self.Time = time
         self.Magnitude = magnitude
-        #print(self.Time)
+        self.MaxMagnitude = max(self.Magnitude)
+        self.MinMagnitude = min(self.Magnitude)
 
     def update_figure(self):
         self.axes.cla()
@@ -98,6 +99,8 @@ class MyDynamicMplCanvas(MyMplCanvas):
                 self.CountIn += 1
             else:
                 self.axes.set_xlim(0, 200)
+
+        self.axes.set_ylim(self.MinMagnitude, self.MaxMagnitude)
         if self.CountIn+self.scrollDisplacement+self.movePages>= 0 and self.CountIn+self.scrollDisplacement +self.movePages<= self.CountOut:
             self.axes.plot(self.Time[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], self.Magnitude[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], '#9e4bae')
             self.axes.grid(color = "#dccbcf", linewidth = 2)
