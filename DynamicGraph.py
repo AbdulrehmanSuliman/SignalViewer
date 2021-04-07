@@ -80,6 +80,8 @@ class MyDynamicMplCanvas(MyMplCanvas):
             self.CountOut += 1
             if self.CountOut - self.CountIn >= self.CountRange :
                 self.CountIn += 1
+            else:
+                self.axes.set_xlim(0, 200)
         if self.CountIn+self.scrollDisplacement>= 0 and self.CountIn+self.scrollDisplacement <= self.CountOut:
             self.axes.plot(self.Time[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], self.Magnitude[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], '#9e4bae')
             self.axes.grid(color = "#dccbcf", linewidth = 2)
@@ -94,7 +96,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
         #     #self.axes.plot(self.Time[self.CountIn:self.CountOut], self.Magnitude[self.CountIn:self.CountOut], 'r')
         
         self.Spectro.cla()
-        #self.Spectro.specgram(self.Magnitude[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], Fs=100)
+        self.Spectro.specgram(self.Magnitude[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], Fs=100)
         
         self.draw()
 
@@ -126,9 +128,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
             print(newDisplacement)
         # newDisplacement= lastIndexNow - ceil((self.scrollBarValue * self.CountOut)/99)
         
-        print("ola")
         if self.CountIn-newDisplacement >= 0:
-            print("loko")
             self.scrollDisplacement = -newDisplacement
 
         # if newDisplacement >= 0:
