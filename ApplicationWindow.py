@@ -38,11 +38,30 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.pdf_menu.addAction('Create PDF', self.CreatePDF, QtCore.Qt.CTRL + QtCore.Qt.SHIFT + QtCore.Qt.Key_P)
         self.menuBar().addMenu(self.pdf_menu)
 
-        self.main_widget = QtWidgets.QWidget(self)
+        self.Toolbar = QtWidgets.QToolBar()
+        self.Toolbar.setIconSize(QtCore.QSize(30, 30))
+        self.Toolbar.addAction(QIcon("image/open file.png"),"Open file", self.SelectFile)
+        self.Toolbar.addSeparator()
+        self.Toolbar.addAction(QIcon("image/pause.png"),"Pause signal", self.Pause)
+        self.Toolbar.addAction(QIcon("image/play.png"),"Play signal", self.Start)
+        self.Toolbar.addSeparator()
+        self.Toolbar.addAction(QIcon("image/zoom in.png"),"Zoom in", self.ZoomIn)
+        self.Toolbar.addAction(QIcon("image/zoom out.png"),"Zoom Out", self.ZoomOut)
+        self.Toolbar.addAction(QIcon("image/arrow left.png"),"Move left", self.MoveLeft)
+        self.Toolbar.addAction(QIcon("image/arrow right.png"),"Move right", self.MoveRight)
+        self.Toolbar.addSeparator()
+        self.Toolbar.addAction(QIcon("image/add to pdf.png"),"Add to PDF", self.AddToPDF)
+        self.Toolbar.addAction(QIcon("image/create pdf.png"),"Create PDF", self.CreatePDF)
+
+        self.main_widget = QtWidgets.QWidget    (self)
 
         Layout = QtWidgets.QVBoxLayout(self.main_widget)
-        self.DynamicGraph = MyDynamicMplCanvas(self.main_widget, width=5, height=4, dpi=100)
+        self.DynamicGraph = MyDynamicMplCanvas(self.main_widget, width=5*2, height=4*2, dpi=100)
+        self.Scrollbar = QtWidgets.QScrollBar(QtCore.Qt.Horizontal)
+        self.Scrollbar.valueChanged.connect(lambda: self.ScrollAction())
+        Layout.addWidget(self.Toolbar)
         Layout.addWidget(self.DynamicGraph)
+        Layout.addWidget(self.Scrollbar)
 
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)
@@ -50,12 +69,21 @@ class ApplicationWindow(QtWidgets.QMainWindow):
     def fileQuit(self):
         self.close()
 
+    def ScrollAction(self):
+        self.DynamicGraph.ScrollUpdator(self.Scrollbar.value())
+
     def closeEvent(self, ce):
         self.fileQuit()
 
     def stopSignal(self):
         self.DynamicGraph.SetIsStop()
-        
+    
+    def Pause(self):
+        self.DynamicGraph.PauseSignal()
+    
+    def Start(self):
+        self.DynamicGraph.StartSignal()
+    
     def ZoomIn(self):
         self.DynamicGraph.SetZoomFactor(True)
 

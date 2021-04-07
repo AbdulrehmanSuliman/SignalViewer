@@ -44,6 +44,12 @@ class MyDynamicMplCanvas(MyMplCanvas):
         else:
             self.IsStop=True
 
+    def PauseSignal(self):
+        self.IsStop = False
+
+    def StartSignal(self):
+        self.IsStop = True 
+
     def SetScrollDisplacement(self,movedValue):
 
         self.scrollDisplacement+=movedValue
@@ -74,13 +80,16 @@ class MyDynamicMplCanvas(MyMplCanvas):
                 self.CountIn += 1
 
         if self.CountIn+self.scrollDisplacement>= 0 and self.CountIn+self.scrollDisplacement <= self.CountOut:
-            self.axes.plot(self.Time[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], self.Magnitude[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], 'r')
+            self.axes.plot(self.Time[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], self.Magnitude[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], '#9e4bae')
+            self.axes.grid(color = "#dccbcf", linewidth = 2)
+            
         else:
             if self.scrollDisplacement>0:
                 self.scrollDisplacement-=50
             if self.scrollDisplacement<0:
                 self.scrollDisplacement+=50
-            self.axes.plot(self.Time[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], self.Magnitude[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], 'r')
+            self.axes.plot(self.Time[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], self.Magnitude[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], '#9e4bae')
+            self.axes.grid(color = "#dccbcf", linewidth = 2)
             #self.axes.plot(self.Time[self.CountIn:self.CountOut], self.Magnitude[self.CountIn:self.CountOut], 'r')
         
         self.Spectro.cla()
@@ -99,3 +108,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
             if (self.CountIn<0):
                 self.CountIn = 0
             self.IsZoomed=False
+
+    def ScrollUpdator(self, percentage):
+        print(percentage)
+            
