@@ -72,6 +72,13 @@ class ApplicationWindow(QtWidgets.QMainWindow):
     def ScrollAction(self):
         self.DynamicGraph.ScrollUpdator(self.Scrollbar.value())
 
+    def SetScrollbar(self, percentage):
+        if percentage<0 or percentage>99:
+            print ("Percentage is out of range")
+            return
+
+        self.Scrollbar.setValue(percentage)
+
     def closeEvent(self, ce):
         self.fileQuit()
 
