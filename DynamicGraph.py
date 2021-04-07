@@ -37,6 +37,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.IsZoomed=False
         self.CountRange = 200
         self.scrollDisplacement=0
+        self.scrollBarValue=99
 
     def SetIsStop(self):
         if self.IsStop:   
@@ -57,7 +58,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
     def SetTimer(self):
         timer = QtCore.QTimer(self)
         timer.timeout.connect(self.update_figure)
-        timer.start(1)
+        timer.start(100)
 
     def SetTimeAndMagnitude(self, time, magnitude):
         self.CountOut = 0
@@ -69,31 +70,31 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.CountRange = 200
         self.Time = time
         self.Magnitude = magnitude
-        print(self.Time)
+        #print(self.Time)
 
     def update_figure(self):
         self.axes.cla()
-
+        self.Scrolling(self.CountOut+self.scrollDisplacement)
+        print(self.scrollDisplacement)
         if self.IsStop:
             self.CountOut += 1
             if self.CountOut - self.CountIn >= self.CountRange :
                 self.CountIn += 1
-
         if self.CountIn+self.scrollDisplacement>= 0 and self.CountIn+self.scrollDisplacement <= self.CountOut:
             self.axes.plot(self.Time[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], self.Magnitude[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], '#9e4bae')
             self.axes.grid(color = "#dccbcf", linewidth = 2)
             
-        else:
-            if self.scrollDisplacement>0:
-                self.scrollDisplacement-=50
-            if self.scrollDisplacement<0:
-                self.scrollDisplacement+=50
-            self.axes.plot(self.Time[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], self.Magnitude[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], '#9e4bae')
-            self.axes.grid(color = "#dccbcf", linewidth = 2)
-            #self.axes.plot(self.Time[self.CountIn:self.CountOut], self.Magnitude[self.CountIn:self.CountOut], 'r')
+        # else:
+        #     if self.scrollDisplacement>0:
+        #         self.scrollDisplacement-=50
+        #     if self.scrollDisplacement<0:
+        #         self.scrollDisplacement+=50
+        #     self.axes.plot(self.Time[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], self.Magnitude[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], '#9e4bae')
+        #     self.axes.grid(color = "#dccbcf", linewidth = 2)
+        #     #self.axes.plot(self.Time[self.CountIn:self.CountOut], self.Magnitude[self.CountIn:self.CountOut], 'r')
         
         self.Spectro.cla()
-        self.Spectro.specgram(self.Magnitude[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], Fs=100)
+        #self.Spectro.specgram(self.Magnitude[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], Fs=100)
         
         self.draw()
 
@@ -106,9 +107,32 @@ class MyDynamicMplCanvas(MyMplCanvas):
             self.CountIn = self.CountIn - 50
             self.CountRange = self.CountOut - self.CountIn
             if (self.CountIn<0):
-                self.CountIn = 0
+                self.CountIn = 0 
             self.IsZoomed=False
 
-    def ScrollUpdator(self, percentage):
-        print(percentage)
+    def ScrollUpdator(self, percentage ):
+        self.scrollBarValue=percentage
+        # newDisplacement= self.CountOut+self.scrollDisplacement - ceil((self.scrollBarValue * self.CountOut)/90)
+        # if newDisplacement >= 0:
+        #     self.scrollDisplacement -= newDisplacement
+        # else:
+        #     self.scrollDisplacement += newDisplacement
+        print(self.scrollBarValue)
+
+    def Scrolling(self , lastIndexNow):
+        newDisplacement=0
+        if self.CountOut >=200:
+            newDisplacement= self.CountOut-200 - ceil((self.scrollBarValue * (self.CountOut-200))/99)
+            print(newDisplacement)
+        # newDisplacement= lastIndexNow - ceil((self.scrollBarValue * self.CountOut)/99)
+        
+        print("ola")
+        if self.CountIn-newDisplacement >= 0:
+            print("loko")
+            self.scrollDisplacement = -newDisplacement
+
+        # if newDisplacement >= 0:
+        #     self.scrollDisplacement -= newDisplacement
+        # else:
+        #     self.scrollDisplacement += newDisplacement
             
