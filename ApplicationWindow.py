@@ -132,21 +132,21 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         screenshot.save('photo.jpg','jpg')
         im = Image.open("photo.jpg")
         width, height = im.size
-        left = 10
-        top = height/8
-        right = 500
+        left = 15
+        top = height/5
+        right = 820
         bottom = 3.75 * height / 4
         im1 = im.crop((left, top, right, bottom))
-        newsize = (220, 220)
+        newsize = (400, 220)
         im1 = im1.resize(newsize)
         if self.GraphsInPDF == 0:
-            imagedata = [im1, 70, 490, 70,720, 350,670, self.fname]
+            imagedata = [im1, 70, 490, 70,720,self.fname]
             self.ImageList.append(imagedata)
         elif self.GraphsInPDF == 1:
-            imagedata = [im1,300, 220, 350, 460, 100, 400, self.fname]
+            imagedata = [im1,70, 245, 70, 470, self.fname]
             self.ImageList.append(imagedata)
         elif self.GraphsInPDF == 2:
-            imagedata = [im1,70, 0, 70, 230, 350,150, self.fname]
+            imagedata = [im1,70, 0, 70, 230, self.fname]
             self.ImageList.append(imagedata)
         
         self.GraphsInPDF+=1
@@ -161,11 +161,10 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         pdf.setFont('abc', 36)
         pdf.drawCentredString(300, 770, 'Report')   #title
 
-        for image,imgxcord,imgycord, namexcord, nameycord, notesxcord, notesycord, GraphName in self.ImageList:  
+        for image,imgxcord,imgycord, namexcord, nameycord,GraphName in self.ImageList:  
             pdf.setFillColorRGB(0, 0, 0)    #subtitle
             pdf.setFont("Courier-Bold", 14)
             pdf.drawString(namexcord, nameycord, GraphName)
-            pdf.drawString(notesxcord, notesycord, "Notes:-")
             pdf.drawInlineImage(image,imgxcord, imgycord)
 
         pdf.save()
