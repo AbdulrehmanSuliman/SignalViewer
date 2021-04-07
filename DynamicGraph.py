@@ -38,6 +38,9 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.CountRange = 200
         self.scrollDisplacement=0
         self.scrollBarValue=99
+        self.pageRight= False
+        self.pageLeft= False
+        self.movePages=0
 
     def SetIsStop(self):
         if self.IsStop:   
@@ -51,14 +54,26 @@ class MyDynamicMplCanvas(MyMplCanvas):
     def StartSignal(self):
         self.IsStop = True 
 
-    def SetScrollDisplacement(self,movedValue):
+    def SetMovePages(self):
+        if self.pageLeft :
+            self.movePages-=200
+            self.pageLeft =False
+        if self.pageRight:
+            self.movePages+=200
+            self.pageRight=False
 
-        self.scrollDisplacement+=movedValue
 
+
+    def setpageRight(self):
+        self.pageRight=True
+
+    def setpageLeft(self):
+        self.pageLeft=True
+    
     def SetTimer(self):
         timer = QtCore.QTimer(self)
         timer.timeout.connect(self.update_figure)
-        timer.start(100)
+        timer.start(1)
 
     def SetTimeAndMagnitude(self, time, magnitude):
         self.CountOut = 0
@@ -76,27 +91,28 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.axes.cla()
         self.Scrolling(self.CountOut+self.scrollDisplacement)
         print(self.scrollDisplacement)
+        self.SetMovePages()
         if self.IsStop:
             self.CountOut += 1
             if self.CountOut - self.CountIn >= self.CountRange :
                 self.CountIn += 1
             else:
                 self.axes.set_xlim(0, 200)
-        if self.CountIn+self.scrollDisplacement>= 0 and self.CountIn+self.scrollDisplacement <= self.CountOut:
-            self.axes.plot(self.Time[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], self.Magnitude[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], '#9e4bae')
+        if self.CountIn+self.scrollDisplacement+self.movePages>= 0 and self.CountIn+self.scrollDisplacement +self.movePages<= self.CountOut:
+            self.axes.plot(self.Time[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], self.Magnitude[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], '#9e4bae')
             self.axes.grid(color = "#dccbcf", linewidth = 2)
             
-        # else:
-        #     if self.scrollDisplacement>0:
-        #         self.scrollDisplacement-=50
-        #     if self.scrollDisplacement<0:
-        #         self.scrollDisplacement+=50
-        #     self.axes.plot(self.Time[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], self.Magnitude[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], '#9e4bae')
-        #     self.axes.grid(color = "#dccbcf", linewidth = 2)
-        #     #self.axes.plot(self.Time[self.CountIn:self.CountOut], self.Magnitude[self.CountIn:self.CountOut], 'r')
+        else:
+            if self.movePages>0:
+                self.movePages-=200
+            if self.movePages<0:
+                self.movePages+=200
+            self.axes.plot(self.Time[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], self.Magnitude[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], '#9e4bae')
+            self.axes.grid(color = "#dccbcf", linewidth = 2)
+            #self.axes.plot(self.Time[self.CountIn:self.CountOut], self.Magnitude[self.CountIn:self.CountOut], 'r')
         
         self.Spectro.cla()
-        self.Spectro.specgram(self.Magnitude[self.CountIn+self.scrollDisplacement:self.CountOut+self.scrollDisplacement], Fs=100)
+        self.Spectro.specgram(self.Magnitude[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], Fs=100)
         
         self.draw()
 

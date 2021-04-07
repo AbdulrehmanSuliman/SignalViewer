@@ -98,9 +98,9 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.DynamicGraph.SetZoomFactor(False)
 
     def MoveRight(self):
-        self.DynamicGraph.SetScrollDisplacement(50)
+        self.DynamicGraph.setpageRight()
     def MoveLeft(self):
-        self.DynamicGraph.SetScrollDisplacement(-50)
+        self.DynamicGraph.setpageLeft()
     
     def open_dialog_box(self):
         filename = QFileDialog.getOpenFileName()
