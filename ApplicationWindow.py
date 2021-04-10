@@ -53,21 +53,37 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.Toolbar.addAction(QIcon("image/add to pdf.png"),"Add to PDF", self.AddToPDF)
         self.Toolbar.addAction(QIcon("image/create pdf.png"),"Create PDF", self.CreatePDF)
 
-        self.main_widget = QtWidgets.QWidget    (self)
+        
+        self.main_widget = QtWidgets.QWidget(self)
+        self.DynamicGraph = MyDynamicMplCanvas(self.main_widget, width=5*2, height=4*2, dpi=100)
 
         Layout = QtWidgets.QVBoxLayout(self.main_widget)
-        self.DynamicGraph = MyDynamicMplCanvas(self.main_widget, width=5*2, height=4*2, dpi=100)
+
         self.Scrollbar = QtWidgets.QScrollBar(QtCore.Qt.Horizontal)
         self.Scrollbar.valueChanged.connect(lambda: self.ScrollAction())
+        
+        self.WindowTab = QtWidgets.QTabWidget()
+        self.FirstTab = QtWidgets.QWidget()
+
+        self.TabLayout = QtWidgets.QGridLayout(self.FirstTab)
+        self.TabLayout.addWidget(self.DynamicGraph, 0, 0)
+        self.TabLayout.addWidget(self.Scrollbar, 1, 0)
+
+        self.WindowTab.addTab(self.FirstTab, "Tab 1")
+        
+        
+
         Layout.addWidget(self.Toolbar)
-        Layout.addWidget(self.DynamicGraph)
-        Layout.addWidget(self.Scrollbar)
+        Layout.addWidget(self.WindowTab)
+
 
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)
 
     def fileQuit(self):
-        self.close()
+        self.SecondTab = QtWidgets.QWidget()
+        self.WindowTab.addTab(self.SecondTab, "Tab 1")
+        #self.close()
 
     def ScrollAction(self):
         self.DynamicGraph.ScrollUpdator(self.Scrollbar.value())

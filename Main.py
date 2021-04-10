@@ -2,10 +2,10 @@ from __future__ import unicode_literals
 import sys
 import os
 from ApplicationWindow import ApplicationWindow
-from PyQt5.QtWidgets import QApplication  
+from PyQt5.QtWidgets import QApplication
 
 qApp = QApplication(sys.argv)
-aw = ApplicationWindow() 
+aw = ApplicationWindow()
 aw.setWindowTitle("Signal Viewer")
 aw.show()
 sys.exit(qApp.exec_())

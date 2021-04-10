@@ -112,8 +112,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
                 self.movePages+=200
             self.axes.plot(self.Time[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], self.Magnitude[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], '#9e4bae')
             self.axes.grid(color = "#dccbcf", linewidth = 2)
-            #self.axes.plot(self.Time[self.CountIn:self.CountOut], self.Magnitude[self.CountIn:self.CountOut], 'r')
-        
+                    
         self.Spectro.cla()
         self.Spectro.specgram(self.Magnitude[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], Fs=100)
         
@@ -133,11 +132,6 @@ class MyDynamicMplCanvas(MyMplCanvas):
 
     def ScrollUpdator(self, percentage ):
         self.scrollBarValue=percentage
-        # newDisplacement= self.CountOut+self.scrollDisplacement - ceil((self.scrollBarValue * self.CountOut)/90)
-        # if newDisplacement >= 0:
-        #     self.scrollDisplacement -= newDisplacement
-        # else:
-        #     self.scrollDisplacement += newDisplacement
         print(self.scrollBarValue)
 
     def Scrolling(self , lastIndexNow):
@@ -145,13 +139,9 @@ class MyDynamicMplCanvas(MyMplCanvas):
         if self.CountOut >=200:
             newDisplacement= self.CountOut-200 - ceil((self.scrollBarValue * (self.CountOut-200))/99)
             print(newDisplacement)
-        # newDisplacement= lastIndexNow - ceil((self.scrollBarValue * self.CountOut)/99)
+
         
         if self.CountIn-newDisplacement >= 0:
             self.scrollDisplacement = -newDisplacement
 
-        # if newDisplacement >= 0:
-        #     self.scrollDisplacement -= newDisplacement
-        # else:
-        #     self.scrollDisplacement += newDisplacement
             
