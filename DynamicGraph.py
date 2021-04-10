@@ -73,7 +73,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
     def SetTimer(self):
         timer = QtCore.QTimer(self)
         timer.timeout.connect(self.update_figure)
-        timer.start(1)
+        timer.start(0.001)
 
     def SetTimeAndMagnitude(self, time, magnitude):
         self.CountOut = 0
