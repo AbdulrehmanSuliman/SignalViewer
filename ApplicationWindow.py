@@ -16,6 +16,11 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.fname=""
         self.ImageList=[]
         self.GraphsInPDF = 0
+        self.dynamicGraph=[]
+        self.scrollBar=[]
+        self.tabIndex=0
+        self.DynamicGraph=0
+        self.Scrollbar=0
 
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setWindowTitle("application main window")
@@ -60,16 +65,16 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         Layout = QtWidgets.QVBoxLayout(self.main_widget)
 
         self.Scrollbar = QtWidgets.QScrollBar(QtCore.Qt.Horizontal)
-        self.Scrollbar.valueChanged.connect(lambda: self.ScrollAction())
+        #self.Scrollbar.valueChanged.connect(lambda: self.ScrollAction())
         
         self.WindowTab = QtWidgets.QTabWidget()
-        self.FirstTab = QtWidgets.QWidget()
+        #self.FirstTab = QtWidgets.QWidget()
+        self.AddTab()
+        # self.TabLayout = QtWidgets.QGridLayout(self.FirstTab)
+        # self.TabLayout.addWidget(self.DynamicGraph, 0, 0)
+        # self.TabLayout.addWidget(self.Scrollbar, 1, 0)
 
-        self.TabLayout = QtWidgets.QGridLayout(self.FirstTab)
-        self.TabLayout.addWidget(self.DynamicGraph, 0, 0)
-        self.TabLayout.addWidget(self.Scrollbar, 1, 0)
-
-        self.WindowTab.addTab(self.FirstTab, "Tab 1")
+        # self.WindowTab.addTab(self.FirstTab, "Tab 1")
         
         
 
@@ -81,9 +86,24 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.setCentralWidget(self.main_widget)
 
     def fileQuit(self):
-        self.SecondTab = QtWidgets.QWidget()
-        self.WindowTab.addTab(self.SecondTab, "Tab 1")
+        self.AddTab()
         #self.close()
+
+    def AddTab(self):
+        
+        self.addNewTab = QtWidgets.QWidget()
+        self.WindowTab.addTab(self.addNewTab, "Tab "+str(self.tabIndex+1))
+        self.dynamicGraph.append(MyDynamicMplCanvas(self.main_widget, width=5*2, height=4*2, dpi=100))
+        self.scrollBar.append(QtWidgets.QScrollBar(QtCore.Qt.Horizontal))
+        self.scrollBar[self.tabIndex].valueChanged.connect(lambda: self.ScrollAction())
+        self.TabLayout = QtWidgets.QGridLayout(self.addNewTab)
+        self.TabLayout.addWidget(self.dynamicGraph[self.tabIndex], 0, 0)
+        self.TabLayout.addWidget(self.scrollBar[self.tabIndex], 1, 0)
+        # to be changed
+        self.DynamicGraph=self.dynamicGraph[self.tabIndex]
+        self.Scrollbar=self.scrollBar[self.tabIndex]
+        self.tabIndex += 1
+
 
     def ScrollAction(self):
         self.DynamicGraph.ScrollUpdator(self.Scrollbar.value())
