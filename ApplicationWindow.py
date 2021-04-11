@@ -21,6 +21,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.tabIndex=0
         self.DynamicGraph=0
         self.Scrollbar=0
+        self.isFirstTab=True
 
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setWindowTitle("application main window")
@@ -76,7 +77,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
         # self.WindowTab.addTab(self.FirstTab, "Tab 1")
         
-        
+        self.WindowTab.currentChanged.connect(self.TabChanged)
 
         Layout.addWidget(self.Toolbar)
         Layout.addWidget(self.WindowTab)
@@ -104,7 +105,11 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.Scrollbar=self.scrollBar[self.tabIndex]
         self.tabIndex += 1
 
-
+    def TabChanged(self):
+        
+        self.DynamicGraph=self.dynamicGraph[self.WindowTab.currentIndex()]
+        self.Scrollbar=self.scrollBar[self.WindowTab.currentIndex()]
+        
     def ScrollAction(self):
         self.DynamicGraph.ScrollUpdator(self.Scrollbar.value())
 
@@ -157,7 +162,9 @@ class ApplicationWindow(QtWidgets.QMainWindow):
             i=i+1
         self.fname=FileName
         Time,trash, Magnitude = np.loadtxt(path,unpack=True)
-        
+        if self.isFirstTab ==False :
+            self.AddTab()
+        self.isFirstTab=False
         self.Scrollbar.setValue(99)
         self.DynamicGraph.SetTimeAndMagnitude(Time, Magnitude)
         self.DynamicGraph.SetTimer()
