@@ -93,6 +93,10 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.MagnitudeOutput = magnitudeOutput
         self.MaxMagnitude = max(self.Magnitude)
         self.MinMagnitude = min(self.Magnitude)
+        self.MaxMagnitudeOutput = max(self.MagnitudeOutput)
+        self.MinMagnitudeOutput = min(self.MagnitudeOutput)
+
+        
 
     def update_figure(self):
         self.Input.cla()
@@ -109,7 +113,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
                 self.Output.set_xlim(0, 200)
 
         self.Input.set_ylim(self.MinMagnitude, self.MaxMagnitude)
-        # self.Output.set_ylim(self.MinMagnitude, self.MaxMagnitude)
+        self.Output.set_ylim(self.MinMagnitudeOutput, self.MaxMagnitudeOutput)
         if self.CountIn+self.scrollDisplacement+self.movePages>= 0 and self.CountIn+self.scrollDisplacement +self.movePages<= self.CountOut:
             self.Input.plot(self.Time[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], self.Magnitude[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], '#9e4bae')
             self.Input.grid(color = "#dccbcf", linewidth = 2)
@@ -239,6 +243,9 @@ class MyDynamicMplCanvas(MyMplCanvas):
             elif value<self.val9 and value!=0:
                 self.SetSliderValueDown(index,value)
                 self.val9=value
+        self.MaxMagnitudeOutput = max(self.MagnitudeOutput)
+        self.MinMagnitudeOutput = min(self.MagnitudeOutput)
+
 
         
 
