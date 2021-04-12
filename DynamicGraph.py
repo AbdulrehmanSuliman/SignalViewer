@@ -9,8 +9,9 @@ class MyMplCanvas(FigureCanvas):
 
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         fig = Figure(figsize=(width, height), dpi=dpi)
-        self.axes = fig.add_subplot(211)
-        self.Spectro = fig.add_subplot(212)
+        self.Input = fig.add_subplot(311)
+        self.Output = fig.add_subplot(312)
+        self.Spectro = fig.add_subplot(313)
 
         self.compute_initial_figure()
 
@@ -89,7 +90,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.MinMagnitude = min(self.Magnitude)
 
     def update_figure(self):
-        self.axes.cla()
+        self.Input.cla()
         self.Scrolling(self.CountOut+self.scrollDisplacement)
         print(self.scrollDisplacement)
         self.SetMovePages()
@@ -98,20 +99,20 @@ class MyDynamicMplCanvas(MyMplCanvas):
             if self.CountOut - self.CountIn >= self.CountRange :
                 self.CountIn += 1
             else:
-                self.axes.set_xlim(0, 200)
+                self.Input.set_xlim(0, 200)
 
-        self.axes.set_ylim(self.MinMagnitude, self.MaxMagnitude)
+        self.Input.set_ylim(self.MinMagnitude, self.MaxMagnitude)
         if self.CountIn+self.scrollDisplacement+self.movePages>= 0 and self.CountIn+self.scrollDisplacement +self.movePages<= self.CountOut:
-            self.axes.plot(self.Time[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], self.Magnitude[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], '#9e4bae')
-            self.axes.grid(color = "#dccbcf", linewidth = 2)
+            self.Input.plot(self.Time[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], self.Magnitude[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], '#9e4bae')
+            self.Input.grid(color = "#dccbcf", linewidth = 2)
             
         else:
             if self.movePages>0:
                 self.movePages-=200
             if self.movePages<0:
                 self.movePages+=200
-            self.axes.plot(self.Time[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], self.Magnitude[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], '#9e4bae')
-            self.axes.grid(color = "#dccbcf", linewidth = 2)
+            self.Input.plot(self.Time[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], self.Magnitude[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], '#9e4bae')
+            self.Input.grid(color = "#dccbcf", linewidth = 2)
                     
         self.Spectro.cla()
         self.Spectro.specgram(self.Magnitude[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], Fs=100)
@@ -129,6 +130,9 @@ class MyDynamicMplCanvas(MyMplCanvas):
             if (self.CountIn<0):
                 self.CountIn = 0 
             self.IsZoomed=False
+
+    def SliderChanged(self, index, value):
+        print("Index: {}, Value: {}".format(index, value))
 
     def ScrollUpdator(self, percentage ):
         self.scrollBarValue=percentage

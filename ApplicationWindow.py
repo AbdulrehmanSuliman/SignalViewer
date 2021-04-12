@@ -16,8 +16,10 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.fname=""
         self.ImageList=[]
         self.GraphsInPDF = 0
-        self.dynamicGraph=[]
-        self.scrollBar=[]
+        self.DynamicGraphList=[]
+        self.ScrollBarList=[]
+        self.SliderListOfLists = []
+        self.SliderList = []
         self.tabIndex=0
         self.DynamicGraph=0
         self.Scrollbar=0
@@ -61,54 +63,92 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
         
         self.main_widget = QtWidgets.QWidget(self)
-        self.DynamicGraph = MyDynamicMplCanvas(self.main_widget, width=5*2, height=4*2, dpi=100)
 
         Layout = QtWidgets.QVBoxLayout(self.main_widget)
 
         self.Scrollbar = QtWidgets.QScrollBar(QtCore.Qt.Horizontal)
-        #self.Scrollbar.valueChanged.connect(lambda: self.ScrollAction())
         
         self.WindowTab = QtWidgets.QTabWidget()
-        #self.FirstTab = QtWidgets.QWidget()
         self.AddTab()
-        # self.TabLayout = QtWidgets.QGridLayout(self.FirstTab)
-        # self.TabLayout.addWidget(self.DynamicGraph, 0, 0)
-        # self.TabLayout.addWidget(self.Scrollbar, 1, 0)
-
-        # self.WindowTab.addTab(self.FirstTab, "Tab 1")
         
         self.WindowTab.currentChanged.connect(self.TabChanged)
 
         Layout.addWidget(self.Toolbar)
         Layout.addWidget(self.WindowTab)
 
-
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)
 
     def fileQuit(self):
-        self.AddTab()
-        #self.close()
+        self.close()
 
     def AddTab(self):
         
         self.addNewTab = QtWidgets.QWidget()
+        self.TabLayout = QtWidgets.QHBoxLayout(self.addNewTab)
+        self.GraphLayout = QtWidgets.QVBoxLayout(self.addNewTab)
+        self.TabLayout.addLayout(self.GraphLayout)
+        
         self.WindowTab.addTab(self.addNewTab, "Tab "+str(self.tabIndex+1))
-        self.dynamicGraph.append(MyDynamicMplCanvas(self.main_widget, width=5*2, height=4*2, dpi=100))
-        self.scrollBar.append(QtWidgets.QScrollBar(QtCore.Qt.Horizontal))
-        self.scrollBar[self.tabIndex].valueChanged.connect(lambda: self.ScrollAction())
-        self.TabLayout = QtWidgets.QGridLayout(self.addNewTab)
-        self.TabLayout.addWidget(self.dynamicGraph[self.tabIndex], 0, 0)
-        self.TabLayout.addWidget(self.scrollBar[self.tabIndex], 1, 0)
+
+        self.DynamicGraphList.append(MyDynamicMplCanvas(self.main_widget, width=5*2, height=4*2, dpi=100))
+
+        self.ScrollBarList.append(QtWidgets.QScrollBar(QtCore.Qt.Horizontal))
+        self.ScrollBarList[self.tabIndex].valueChanged.connect(lambda: self.ScrollAction())
+
+        self.SliderList = []
+        for i in range(10):
+            self.SliderList.append(QtWidgets.QSlider(QtCore.Qt.Vertical))
+            self.SliderList[i].setValue(20)
+            self.SliderList[i].valueChanged.connect(lambda: self.SliderChanged())
+            self.SliderList[i].setTickPosition(QtWidgets.QSlider.TicksAbove)
+            self.SliderList[i].setTickInterval(10)
+        self.SliderListOfLists.append(self.SliderList)
+        self.SliderLayout = QtWidgets.QGridLayout(self.addNewTab)
+        self.SliderLayout.setHorizontalSpacing(20)
+        self.SliderLayout.setVerticalSpacing(30) 
+
+        self.GraphLayout.addWidget(self.DynamicGraphList[self.tabIndex])
+        self.GraphLayout.addWidget(self.ScrollBarList[self.tabIndex])
+        
+        i = 0
+        for x in range(2):
+            for y in range(5):
+                self.SliderLayout.addWidget(self.SliderList[i], x, y)
+                i+=1
+        self.TabLayout.addLayout(self.SliderLayout)
+        
         # to be changed
-        self.DynamicGraph=self.dynamicGraph[self.tabIndex]
-        self.Scrollbar=self.scrollBar[self.tabIndex]
+        self.DynamicGraph=self.DynamicGraphList[self.tabIndex]
+        self.Scrollbar=self.ScrollBarList[self.tabIndex]
         self.tabIndex += 1
+    
+    def SliderChanged(self):
+        if self.SliderList[0].isSliderDown():
+            self.DynamicGraph.SliderChanged(0, self.SliderList[0].value()*(5/99))
+        elif self.SliderList[1].isSliderDown():
+            self.DynamicGraph.SliderChanged(1, self.SliderList[1].value()*(5/99))
+        elif self.SliderList[2].isSliderDown():
+            self.DynamicGraph.SliderChanged(2, self.SliderList[2].value()*(5/99))
+        elif self.SliderList[3].isSliderDown():
+            self.DynamicGraph.SliderChanged(3, self.SliderList[3].value()*(5/99))
+        elif self.SliderList[4].isSliderDown():
+            self.DynamicGraph.SliderChanged(4, self.SliderList[4].value()*(5/99))
+        elif self.SliderList[5].isSliderDown():
+            self.DynamicGraph.SliderChanged(5, self.SliderList[5].value()*(5/99))
+        elif self.SliderList[6].isSliderDown():
+            self.DynamicGraph.SliderChanged(6, self.SliderList[6].value()*(5/99))
+        elif self.SliderList[7].isSliderDown():
+            self.DynamicGraph.SliderChanged(7, self.SliderList[7].value()*(5/99))
+        elif self.SliderList[8].isSliderDown():
+            self.DynamicGraph.SliderChanged(8, self.SliderList[8].value()*(5/99))
+        elif self.SliderList[9].isSliderDown():
+            self.DynamicGraph.SliderChanged(9, self.SliderList[9].value()*(5/99))
 
     def TabChanged(self):
-        
-        self.DynamicGraph=self.dynamicGraph[self.WindowTab.currentIndex()]
-        self.Scrollbar=self.scrollBar[self.WindowTab.currentIndex()]
+        self.DynamicGraph = self.DynamicGraphList[self.WindowTab.currentIndex()]
+        self.Scrollbar = self.ScrollBarList[self.WindowTab.currentIndex()]
+        self.SliderList = self.SliderListOfLists[self.WindowTab.currentIndex()]
         
     def ScrollAction(self):
         self.DynamicGraph.ScrollUpdator(self.Scrollbar.value())
