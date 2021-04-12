@@ -20,6 +20,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.ScrollBarList=[]
         self.SliderListOfLists = []
         self.SliderList = []
+        self.sliderindex = 0
         self.tabIndex=0
         self.DynamicGraph=0
         self.Scrollbar=0
@@ -100,7 +101,8 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         for i in range(10):
             self.SliderList.append(QtWidgets.QSlider(QtCore.Qt.Vertical))
             self.SliderList[i].setValue(20)
-            self.SliderList[i].valueChanged.connect(lambda: self.SliderChanged())
+            self.SliderList[i].sliderPressed.connect(lambda: self.SliderPressed())
+            self.SliderList[i].sliderReleased.connect(lambda: self.SliderReleased())
             self.SliderList[i].setTickPosition(QtWidgets.QSlider.TicksAbove)
             self.SliderList[i].setTickInterval(10)
         self.SliderListOfLists.append(self.SliderList)
@@ -123,27 +125,50 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.Scrollbar=self.ScrollBarList[self.tabIndex]
         self.tabIndex += 1
     
-    def SliderChanged(self):
-        if self.SliderList[0].isSliderDown():
+    def SliderReleased(self):
+        if self.sliderindex == 0:
             self.DynamicGraph.SliderChanged(0, self.SliderList[0].value()*(5/99))
-        elif self.SliderList[1].isSliderDown():
+        elif self.sliderindex == 1:
             self.DynamicGraph.SliderChanged(1, self.SliderList[1].value()*(5/99))
-        elif self.SliderList[2].isSliderDown():
+        elif self.sliderindex == 2:
             self.DynamicGraph.SliderChanged(2, self.SliderList[2].value()*(5/99))
-        elif self.SliderList[3].isSliderDown():
+        elif self.sliderindex == 3:
             self.DynamicGraph.SliderChanged(3, self.SliderList[3].value()*(5/99))
-        elif self.SliderList[4].isSliderDown():
+        elif self.sliderindex == 4:
             self.DynamicGraph.SliderChanged(4, self.SliderList[4].value()*(5/99))
-        elif self.SliderList[5].isSliderDown():
+        elif self.sliderindex == 5:
             self.DynamicGraph.SliderChanged(5, self.SliderList[5].value()*(5/99))
-        elif self.SliderList[6].isSliderDown():
+        elif self.sliderindex == 6:
             self.DynamicGraph.SliderChanged(6, self.SliderList[6].value()*(5/99))
-        elif self.SliderList[7].isSliderDown():
+        elif self.sliderindex == 7:
             self.DynamicGraph.SliderChanged(7, self.SliderList[7].value()*(5/99))
-        elif self.SliderList[8].isSliderDown():
+        elif self.sliderindex == 8:
             self.DynamicGraph.SliderChanged(8, self.SliderList[8].value()*(5/99))
-        elif self.SliderList[9].isSliderDown():
+        elif self.sliderindex == 9:
             self.DynamicGraph.SliderChanged(9, self.SliderList[9].value()*(5/99))
+        
+
+    def SliderPressed(self):    
+        if self.SliderList[0].isSliderDown():
+            self.sliderindex = 0
+        elif self.SliderList[1].isSliderDown():
+            self.sliderindex = 1
+        elif self.SliderList[2].isSliderDown():
+            self.sliderindex = 2
+        elif self.SliderList[3].isSliderDown():
+            self.sliderindex = 3
+        elif self.SliderList[4].isSliderDown():
+            self.sliderindex = 4
+        elif self.SliderList[5].isSliderDown():
+            self.sliderindex = 5
+        elif self.SliderList[6].isSliderDown():
+            self.sliderindex = 6
+        elif self.SliderList[7].isSliderDown():
+            self.sliderindex = 7
+        elif self.SliderList[8].isSliderDown():
+            self.sliderindex = 8
+        elif self.SliderList[9].isSliderDown():
+            self.sliderindex = 9
 
     def TabChanged(self):
         self.DynamicGraph = self.DynamicGraphList[self.WindowTab.currentIndex()]
