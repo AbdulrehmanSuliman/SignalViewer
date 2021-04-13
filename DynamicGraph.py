@@ -4,6 +4,9 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from PyQt5 import QtCore, QtWidgets
 from math import ceil
+from scipy.fft import rfft, rfftfreq ,irfft
+import numpy as np
+
 
 class MyMplCanvas(FigureCanvas):
 
@@ -44,7 +47,9 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.pageRight= False
         self.pageLeft= False
         self.movePages=0
-        self.val0=self.val1=self.val2=self.val3=self.val4=self.val5=self.val6=self.val7=self.val8=self.val9=0
+        #self.val0=self.val1=self.val2=self.val3=self.val4=self.val5=self.val6=self.val7=self.val8=self.val9=0
+        self.FTOfMagnitude=np.array([])
+        
 
     def SetIsStop(self):
         if self.IsStop:   
@@ -77,9 +82,9 @@ class MyDynamicMplCanvas(MyMplCanvas):
     def SetTimer(self):
         timer = QtCore.QTimer(self)
         timer.timeout.connect(self.update_figure)
-        timer.start(0.001)
+        timer.start(1)
 
-    def SetTimeAndMagnitude(self, time, magnitude,timeOutput,magnitudeOutput):
+    def SetTimeAndMagnitude(self, time, magnitude):
         self.CountOut = 0
         self.CountIn = 0
         self.scrollDisplacement=0
@@ -88,9 +93,10 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.IsZoomed=False
         self.CountRange = 200
         self.Time = time
-        self.TimeOutput = timeOutput
-        self.Magnitude = magnitude
-        self.MagnitudeOutput = magnitudeOutput
+        self.Magnitude = magnitude    
+        self.TimeOutput = time
+        self.FTOfMagnitude = rfft(self.Magnitude)
+        self.MagnitudeOutput = magnitude
         self.MaxMagnitude = max(self.Magnitude)
         self.MinMagnitude = min(self.Magnitude)
         self.MaxMagnitudeOutput = max(self.MagnitudeOutput)
@@ -102,7 +108,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.Input.cla()
         self.Output.cla()
         self.Scrolling(self.CountOut+self.scrollDisplacement)
-        print(self.scrollDisplacement)
+        #print(self.scrollDisplacement)
         self.SetMovePages()
         if self.IsStop:
             self.CountOut += 1
@@ -130,13 +136,13 @@ class MyDynamicMplCanvas(MyMplCanvas):
             self.Output.plot(self.TimeOutput[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], self.MagnitudeOutput[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], '#9e4bae')
             self.Output.grid(color = "#dccbcf", linewidth = 2)
             
-                    
-        self.Spectro.cla()
-        #self.Spectro.specgram(self.Magnitude[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], Fs=100)
-        self.Spectro.specgram(self.MagnitudeOutput, Fs=100)
+        
+        self.Spectro.cla()         
+        # #self.Spectro.specgram(self.Magnitude[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], Fs=100)
+        self.Spectro.specgram(self.MagnitudeOutput, Fs=1)
 
         self.draw()
-
+       
     def SetZoomFactor(self,zoomed):
         if zoomed:
             self.CountIn = self.CountIn + ceil( 0.5*(self.CountOut - self.CountIn) )
@@ -149,102 +155,108 @@ class MyDynamicMplCanvas(MyMplCanvas):
                 self.CountIn = 0 
             self.IsZoomed=False
     
-    def SetSliderValueUp(self,index,value):
-        self.MagnitudeOutput[ceil((index/10)*len(self.MagnitudeOutput)):ceil(((index+1)/10)*len(self.MagnitudeOutput))]=self.MagnitudeOutput[ceil((index/10)*len(self.MagnitudeOutput)):ceil(((index+1)/10)*len(self.MagnitudeOutput))] *ceil((value))
-    def SetSliderValueDown(self,index,value):
-        self.MagnitudeOutput[ceil((index/10)*len(self.MagnitudeOutput)):ceil(((index+1)/10)*len(self.MagnitudeOutput))]=self.MagnitudeOutput[ceil((index/10)*len(self.MagnitudeOutput)):ceil(((index+1)/10)*len(self.MagnitudeOutput))] /(ceil((self.val0-value+1)))
+    # def SetSliderValueUp(self,index,value):
+    #     self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]=self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))] *ceil((value))
+
+    #     #self.MagnitudeOutput[ceil((index/10)*len(self.MagnitudeOutput)):ceil(((index+1)/10)*len(self.MagnitudeOutput))]=self.MagnitudeOutput[ceil((index/10)*len(self.MagnitudeOutput)):ceil(((index+1)/10)*len(self.MagnitudeOutput))] *ceil((value))
+    # def SetSliderValueDown(self,index,value):
+    #     self.MagnitudeOutput[ceil((index/10)*len(self.MagnitudeOutput)):ceil(((index+1)/10)*len(self.MagnitudeOutput))]=self.MagnitudeOutput[ceil((index/10)*len(self.MagnitudeOutput)):ceil(((index+1)/10)*len(self.MagnitudeOutput))] /(ceil((self.val0-value+1)))
+
+    def SliderChanged(self, index, value):       
+        self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]=self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))] *(value)
+        self.MagnitudeOutput = irfft(self.FTOfMagnitude)
 
 
-    def SliderChanged(self, index, value):
+    # def SliderChanged(self, index, value):
         
-        #print("Index: {}, Value: {}".format(index, value))
-        if index==0:
-            if value>self.val0:
-                #print("in")
-               # print(self.MagnitudeOutput[10])
-                self.SetSliderValueUp(index,value)
-                #print(self.MagnitudeOutput[10])
-                self.val0=value
-                print(self.val0)
-            elif value<self.val0 and value!=0:
-                print(self.MagnitudeOutput[10])
-                self.SetSliderValueDown(index,value)
-                print(self.MagnitudeOutput[10])
-                self.val0=value
-                #val0=value
-        elif index==1:
-            if value>self.val1:
-                self.SetSliderValueUp(index,value)
-                self.val1=value
-            elif value<self.val1 and value!=0:
-                self.SetSliderValueDown(index,value)
-                self.val1=value
+    #     #print("Index: {}, Value: {}".format(index, value))
+    #     if index==0:
+    #         if value>self.val0:
+    #             #print("in")
+    #            # print(self.MagnitudeOutput[10])
+    #             self.SetSliderValueUp(index,value)
+    #             #print(self.MagnitudeOutput[10])
+    #             self.val0=value
+    #             print(self.val0)
+    #         elif value<self.val0 and value!=0:
+    #             print(self.MagnitudeOutput[10])
+    #             self.SetSliderValueDown(index,value)
+    #             print(self.MagnitudeOutput[10])
+    #             self.val0=value
+    #             #val0=value
+    #     elif index==1:
+    #         if value>self.val1:
+    #             self.SetSliderValueUp(index,value)
+    #             self.val1=value
+    #         elif value<self.val1 and value!=0:
+    #             self.SetSliderValueDown(index,value)
+    #             self.val1=value
 
-        elif index==2:
-            if value>self.val2:
-                self.SetSliderValueUp(index,value)
-                self.val2=value
-            elif value<self.val2 and value!=0:
-                self.SetSliderValueDown(index,value)
-                self.val2=value
+    #     elif index==2:
+    #         if value>self.val2:
+    #             self.SetSliderValueUp(index,value)
+    #             self.val2=value
+    #         elif value<self.val2 and value!=0:
+    #             self.SetSliderValueDown(index,value)
+    #             self.val2=value
 
-        elif index==3:
-            if value>self.val3:
-                self.SetSliderValueUp(index,value)
-                self.val3=value
-            elif value<self.val3 and value!=0:
-                self.SetSliderValueDown(index,value)
-                self.val3=value
+    #     elif index==3:
+    #         if value>self.val3:
+    #             self.SetSliderValueUp(index,value)
+    #             self.val3=value
+    #         elif value<self.val3 and value!=0:
+    #             self.SetSliderValueDown(index,value)
+    #             self.val3=value
 
-        elif index==4:
-            if value>self.val4:
-                self.SetSliderValueUp(index,value)
-                self.val4=value
-            elif value<self.val4 and value!=0:
-                self.SetSliderValueDown(index,value)
-                self.val4=value
+    #     elif index==4:
+    #         if value>self.val4:
+    #             self.SetSliderValueUp(index,value)
+    #             self.val4=value
+    #         elif value<self.val4 and value!=0:
+    #             self.SetSliderValueDown(index,value)
+    #             self.val4=value
 
-        elif index==5:
-            if value>self.val5:
-                self.SetSliderValueUp(index,value)
-                self.val5=value
-            elif value<self.val5 and value!=0:
-                self.SetSliderValueDown(index,value)
-                self.val5=value
+    #     elif index==5:
+    #         if value>self.val5:
+    #             self.SetSliderValueUp(index,value)
+    #             self.val5=value
+    #         elif value<self.val5 and value!=0:
+    #             self.SetSliderValueDown(index,value)
+    #             self.val5=value
 
-        elif index==6:
-            if value>self.val6:
-                self.SetSliderValueUp(index,value)
-                self.val6=value
-            elif value<self.val6 and value!=0:
-                self.SetSliderValueDown(index,value)
-                self.val6=value
+    #     elif index==6:
+    #         if value>self.val6:
+    #             self.SetSliderValueUp(index,value)
+    #             self.val6=value
+    #         elif value<self.val6 and value!=0:
+    #             self.SetSliderValueDown(index,value)
+    #             self.val6=value
 
-        elif index==7:
-            if value>self.val7:
-                self.SetSliderValueUp(index,value)
-                self.val7=value
-            elif value<self.val7 and value!=0:
-                self.SetSliderValueDown(index,value)
-                self.val7=value
+    #     elif index==7:
+    #         if value>self.val7:
+    #             self.SetSliderValueUp(index,value)
+    #             self.val7=value
+    #         elif value<self.val7 and value!=0:
+    #             self.SetSliderValueDown(index,value)
+    #             self.val7=value
 
-        elif index==8:
-            if value>self.val8:
-                self.SetSliderValueUp(index,value)
-                self.val8=value
-            elif value<self.val8 and value!=0:
-                self.SetSliderValueDown(index,value)
-                self.val8=value
+    #     elif index==8:
+    #         if value>self.val8:
+    #             self.SetSliderValueUp(index,value)
+    #             self.val8=value
+    #         elif value<self.val8 and value!=0:
+    #             self.SetSliderValueDown(index,value)
+    #             self.val8=value
 
-        elif index==9:
-            if value>self.val9:
-                self.SetSliderValueUp(index,value)
-                self.val9=value
-            elif value<self.val9 and value!=0:
-                self.SetSliderValueDown(index,value)
-                self.val9=value
-        self.MaxMagnitudeOutput = max(self.MagnitudeOutput)
-        self.MinMagnitudeOutput = min(self.MagnitudeOutput)
+    #     elif index==9:
+    #         if value>self.val9:
+    #             self.SetSliderValueUp(index,value)
+    #             self.val9=value
+    #         elif value<self.val9 and value!=0:
+    #             self.SetSliderValueDown(index,value)
+    #             self.val9=value
+    #     self.MaxMagnitudeOutput = max(self.MagnitudeOutput)
+    #     self.MinMagnitudeOutput = min(self.MagnitudeOutput)
 
 
         
@@ -256,13 +268,13 @@ class MyDynamicMplCanvas(MyMplCanvas):
 
     def ScrollUpdator(self, percentage ):
         self.scrollBarValue=percentage
-        print(self.scrollBarValue)
+        #print(self.scrollBarValue)
 
     def Scrolling(self , lastIndexNow):
         newDisplacement=0
         if self.CountOut >=200:
             newDisplacement= self.CountOut-200 - ceil((self.scrollBarValue * (self.CountOut-200))/99)
-            print(newDisplacement)
+            #print(newDisplacement)
 
         
         if self.CountIn-newDisplacement >= 0:

@@ -236,12 +236,12 @@ class ApplicationWindow(QtWidgets.QMainWindow):
             i=i+1
         self.fname=FileName
         Time,trash, Magnitude = np.loadtxt(path,unpack=True)
-        TimeOutput,trash, MagnitudeOutput = np.loadtxt(path,unpack=True)
+        #TimeOutput,trash, MagnitudeOutput = np.loadtxt(path,unpack=True)
         if self.isFirstTab ==False :
             self.AddTab()
         self.isFirstTab=False
         self.Scrollbar.setValue(99)
-        self.DynamicGraph.SetTimeAndMagnitude(Time, Magnitude,TimeOutput,MagnitudeOutput)
+        self.DynamicGraph.SetTimeAndMagnitude(Time, Magnitude)
         self.DynamicGraph.SetTimer()
 
     def AddToPDF(self):
@@ -268,6 +268,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
             self.ImageList.append(imagedata)
         
         self.GraphsInPDF+=1
+
         
         
     def CreatePDF(self):
