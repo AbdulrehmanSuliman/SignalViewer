@@ -243,47 +243,54 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.Scrollbar.setValue(99)
         self.DynamicGraph.SetTimeAndMagnitude(Time, Magnitude)
         self.DynamicGraph.SetTimer()
-
-    def AddToPDF(self):
-        screen=QtWidgets.QApplication.primaryScreen()
-        screenshot=screen.grabWindow(self.winId())
-        screenshot.save('photo.jpg','jpg')
-        im = Image.open("photo.jpg")
-        width, height = im.size
-        left = 15
-        top = height/5
-        right = 820
-        bottom = 3.75 * height / 4
-        im1 = im.crop((left, top, right, bottom))
-        newsize = (400, 220)
-        im1 = im1.resize(newsize)
-        if self.GraphsInPDF == 0:
-            imagedata = [im1, 70, 490, 70,720,self.fname]
-            self.ImageList.append(imagedata)
-        elif self.GraphsInPDF == 1:
-            imagedata = [im1,70, 245, 70, 470, self.fname]
-            self.ImageList.append(imagedata)
-        elif self.GraphsInPDF == 2:
-            imagedata = [im1,70, 0, 70, 230, self.fname]
-            self.ImageList.append(imagedata)
-        
         self.GraphsInPDF+=1
+    
+    def GetGraphsInPDF(self):
+        return self.GraphsInPDF
+    
+    def AddToPDF(self):
+
+        self.DynamicGraph.AddToPDF()
+        # screen=QtWidgets.QApplication.primaryScreen()
+        # screenshot=screen.grabWindow(self.winId())
+        # screenshot.save('photo.jpg','jpg')
+        # im = Image.open("photo.jpg")
+        # width, height = im.size
+        # left = 15
+        # top = height/5
+        # right = 820
+        # bottom = 3.75 * height / 4
+        # im1 = im.crop((left, top, right, bottom))
+        # newsize = (400, 220)
+        # im1 = im1.resize(newsize)
+        # if self.GraphsInPDF == 0:
+        #     imagedata = [im1, 70, 490, 70,720,self.fname]
+        #     self.ImageList.append(imagedata)
+        # elif self.GraphsInPDF == 1:
+        #     imagedata = [im1,70, 245, 70, 470, self.fname]
+        #     self.ImageList.append(imagedata)
+        # elif self.GraphsInPDF == 2:
+        #     imagedata = [im1,70, 0, 70, 230, self.fname]
+        #     self.ImageList.append(imagedata)
+        
+        # self.GraphsInPDF+=1
 
         
         
     def CreatePDF(self):
-        fileName = 'Report.pdf'
-        documentTitle = 'Report'
-        pdf = canvas.Canvas(fileName)
-        pdf.setTitle(documentTitle)
-        pdfmetrics.registerFont( TTFont('abc', 'SakBunderan.ttf') )
-        pdf.setFont('abc', 36)
-        pdf.drawCentredString(300, 770, 'Report')   #title
+         self.DynamicGraph.CreatePDF()
+        # fileName = 'Report.pdf'
+        # documentTitle = 'Report'
+        # pdf = canvas.Canvas(fileName)
+        # pdf.setTitle(documentTitle)
+        # pdfmetrics.registerFont( TTFont('abc', 'SakBunderan.ttf') )
+        # pdf.setFont('abc', 36)
+        # pdf.drawCentredString(300, 770, 'Report')   #title
 
-        for image,imgxcord,imgycord, namexcord, nameycord,GraphName in self.ImageList:  
-            pdf.setFillColorRGB(0, 0, 0)    #subtitle
-            pdf.setFont("Courier-Bold", 14)
-            pdf.drawString(namexcord, nameycord, GraphName)
-            pdf.drawInlineImage(image,imgxcord, imgycord)
+        # for image,imgxcord,imgycord, namexcord, nameycord,GraphName in self.ImageList:  
+        #     pdf.setFillColorRGB(0, 0, 0)    #subtitle
+        #     pdf.setFont("Courier-Bold", 14)
+        #     pdf.drawString(namexcord, nameycord, GraphName)
+        #     pdf.drawInlineImage(image,imgxcord, imgycord)
 
-        pdf.save()
+        # pdf.save()

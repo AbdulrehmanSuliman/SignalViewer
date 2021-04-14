@@ -1,10 +1,13 @@
+import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('Qt5Agg')
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_pdf import PdfPages 
 from matplotlib.figure import Figure
 from PyQt5 import QtCore, QtWidgets
 from math import ceil
-from scipy.fft import rfft, rfftfreq ,irfft
+from scipy.fftpack import fft
+from scipy.fftpack import rfft, rfftfreq ,irfft
 import numpy as np
 
 
@@ -47,8 +50,10 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.pageRight= False
         self.pageLeft= False
         self.movePages=0
+        self.val=[0]*10
         #self.val0=self.val1=self.val2=self.val3=self.val4=self.val5=self.val6=self.val7=self.val8=self.val9=0
         self.FTOfMagnitude=np.array([])
+        
         
 
     def SetIsStop(self):
@@ -101,6 +106,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.MinMagnitude = min(self.Magnitude)
         self.MaxMagnitudeOutput = max(self.MagnitudeOutput)
         self.MinMagnitudeOutput = min(self.MagnitudeOutput)
+        
 
         
 
@@ -125,6 +131,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
             self.Input.grid(color = "#dccbcf", linewidth = 2)
             self.Output.plot(self.TimeOutput[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], self.MagnitudeOutput[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], '#9e4bae')
             self.Output.grid(color = "#dccbcf", linewidth = 2)
+            
             
         else:
             if self.movePages>0:
@@ -155,16 +162,34 @@ class MyDynamicMplCanvas(MyMplCanvas):
                 self.CountIn = 0 
             self.IsZoomed=False
     
-    # def SetSliderValueUp(self,index,value):
-    #     self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]=self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))] *ceil((value))
+    def SetSliderValueUp(self,index,value):
+        self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]=self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))] *ceil((value))
 
-    #     #self.MagnitudeOutput[ceil((index/10)*len(self.MagnitudeOutput)):ceil(((index+1)/10)*len(self.MagnitudeOutput))]=self.MagnitudeOutput[ceil((index/10)*len(self.MagnitudeOutput)):ceil(((index+1)/10)*len(self.MagnitudeOutput))] *ceil((value))
-    # def SetSliderValueDown(self,index,value):
-    #     self.MagnitudeOutput[ceil((index/10)*len(self.MagnitudeOutput)):ceil(((index+1)/10)*len(self.MagnitudeOutput))]=self.MagnitudeOutput[ceil((index/10)*len(self.MagnitudeOutput)):ceil(((index+1)/10)*len(self.MagnitudeOutput))] /(ceil((self.val0-value+1)))
+    #    #elf.MagnitudeOutput[ceil((index/10)*len(self.MagnitudeOutput)):ceil(((index+1)/10)*len(self.MagnitudeOutput))]=self.MagnitudeOutput[ceil((index/10)*len(self.MagnitudeOutput)):ceil(((index+1)/10)*len(self.MagnitudeOutput))] *ceil((value))
+    def SetSliderValueDown(self,index,value):
+        self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]=self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))] /(ceil((self.val[index]-value+1)))
 
-    def SliderChanged(self, index, value):       
-        self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]=self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))] *(value)
+    def SliderChanged(self, index, value):
+        for i in range(10):
+            if i==index:
+                if value>self.val[i]:
+                    #print("in")
+                # print(self.MagnitudeOutput[10])
+                    self.SetSliderValueUp(index,value)
+                    #print(self.MagnitudeOutput[10])
+                    self.val[i]=value
+                   # print(self.val0)
+                elif value<self.val[i] and value!=0:
+                    # print(self.MagnitudeOutput[10])
+                    self.SetSliderValueDown(index,value)
+                    # print(self.MagnitudeOutput[10])
+                    self.val[i]=value
+        
+
+
         self.MagnitudeOutput = irfft(self.FTOfMagnitude)
+        self.MaxMagnitudeOutput = max(self.MagnitudeOutput)
+        self.MinMagnitudeOutput = min(self.MagnitudeOutput)
 
 
     # def SliderChanged(self, index, value):
@@ -279,5 +304,26 @@ class MyDynamicMplCanvas(MyMplCanvas):
         
         if self.CountIn-newDisplacement >= 0:
             self.scrollDisplacement = -newDisplacement
+    
+    def AddToPDF(self):
+        self.fig=plt.figure()
+        self.fig,self.axs=plt.subplots(3)
+        self.axs[0].plot(self.Time[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], self.Magnitude[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], '#9e4bae')
+        self.axs[0].grid(color = "#dccbcf", linewidth = 2)
+        self.axs[1].plot(self.TimeOutput[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], self.MagnitudeOutput[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], '#9e4bae')
+        self.axs[1].grid(color = "#dccbcf", linewidth = 2)
+        self.axs[2].specgram(self.MagnitudeOutput, Fs=1)
+        return self.fig
+    
+    def CreatePDF(self):
+        pdf= matplotlib.backends.backend_pdf.PdfPages("Output.pdf")
+        graph1=self.AddToPDF()
+        pdf.savefig(graph1)
+        pdf.close()
+
+
+
+
+        
 
             
