@@ -47,10 +47,13 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.CountRange = 200
         self.scrollDisplacement=0
         self.scrollBarValue=99
+        self.MaxIntensity = 0
+        self.MinIntensity = -100
         self.pageRight= False
         self.pageLeft= False
         self.movePages=0
         self.val=[0]*10
+        self.SpectroColor = 'viridis'
         #self.val0=self.val1=self.val2=self.val3=self.val4=self.val5=self.val6=self.val7=self.val8=self.val9=0
         self.FTOfMagnitude=np.array([])
         # validation signal
@@ -59,6 +62,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.validation_signal=[]
         #self.generate_sine_wave(1,1,2)
         self.generate_Validation_Signal()
+                
 
     def generate_sine_wave(self,freq, sample_rate, duration):
     
@@ -111,6 +115,8 @@ class MyDynamicMplCanvas(MyMplCanvas):
         timer = QtCore.QTimer(self)
         timer.timeout.connect(self.update_figure)
         timer.start(1)
+        self.Spectro.cla()         
+        self.Spectro.specgram(self.MagnitudeOutput, Fs=1, cmap=self.SpectroColor, vmin = self.MinIntensity, vmax = self.MaxIntensity)
 
     def SetTimeAndMagnitude(self, time, magnitude):
         self.CountOut = 0
@@ -184,12 +190,28 @@ class MyDynamicMplCanvas(MyMplCanvas):
             self.Output.grid(color = "#dccbcf", linewidth = 2)
             
         
-        self.Spectro.cla()         
-        # #self.Spectro.specgram(self.Magnitude[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], Fs=100)
-        self.Spectro.specgram(self.MagnitudeOutput, Fs=1)
+        # self.Spectro.cla()         
+        # self.Spectro.specgram(self.MagnitudeOutput, Fs=1, cmap=self.SpectroColor)
 
         self.draw()
-       
+
+    def ChangeSpectroColor(self, index):
+        if index == 0:
+            self.SpectroColor = 'viridis'
+        elif index == 1:
+            self.SpectroColor = 'plasma'
+        elif index == 2:
+            self.SpectroColor = 'inferno'
+        elif index == 3:
+            self.SpectroColor = 'magma'
+        elif index == 4:
+            self.SpectroColor = 'cividis'
+        self.Spectro.cla()         
+        self.Spectro.specgram(self.MagnitudeOutput, Fs=1, cmap=self.SpectroColor, vmin = self.MinIntensity, vmax = self.MaxIntensity)
+        
+
+
+
     def SetZoomFactor(self,zoomed):
         if zoomed:
             self.CountIn = self.CountIn + ceil( 0.5*(self.CountOut - self.CountIn) )
@@ -209,27 +231,37 @@ class MyDynamicMplCanvas(MyMplCanvas):
     def SetSliderValueDown(self,index,value):
         self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]=self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))] /(ceil((self.val[index]-value+1)))
 
-    def SliderChanged(self, index, value):
-        for i in range(10):
-            if i==index:
-                if value>self.val[i]:
-                    #print("in")
-                # print(self.MagnitudeOutput[10])
-                    self.SetSliderValueUp(index,value)
-                    #print(self.MagnitudeOutput[10])
-                    self.val[i]=value
-                   # print(self.val0)
-                elif value<self.val[i] and value!=0:
-                    # print(self.MagnitudeOutput[10])
-                    self.SetSliderValueDown(index,value)
-                    # print(self.MagnitudeOutput[10])
-                    self.val[i]=value
+    def SpectroSliderChanged(self, index, value):
+        if index==0:
+            self.MinIntensity = -value *2
+        if index==1:
+            self.MaxIntensity = value *2
+        self.Spectro.cla()         
+        self.Spectro.specgram(self.MagnitudeOutput, Fs=1, cmap=self.SpectroColor, vmin = self.MinIntensity, vmax = self.MaxIntensity)
         
 
+    def SliderChanged(self, index, value):
+        if len(self.Magnitude) > 0:
+            for i in range(10):
+                if i==index:
+                    if value>self.val[i]:
+                        #print("in")
+                    # print(self.MagnitudeOutput[10])
+                        self.SetSliderValueUp(index,value)
+                        #print(self.MagnitudeOutput[10])
+                        self.val[i]=value
+                    # print(self.val0)
+                    elif value<self.val[i] and value!=0:
+                        # print(self.MagnitudeOutput[10])
+                        self.SetSliderValueDown(index,value)
+                        # print(self.MagnitudeOutput[10])
+                        self.val[i]=value
 
-        self.MagnitudeOutput = irfft(self.FTOfMagnitude)
-        self.MaxMagnitudeOutput = max(self.MagnitudeOutput)
-        self.MinMagnitudeOutput = min(self.MagnitudeOutput)
+            self.MagnitudeOutput = irfft(self.FTOfMagnitude)
+            self.MaxMagnitudeOutput = max(self.MagnitudeOutput)
+            self.MinMagnitudeOutput = min(self.MagnitudeOutput)
+            self.Spectro.cla()         
+            self.Spectro.specgram(self.MagnitudeOutput, Fs=1, cmap=self.SpectroColor, vmin = self.MinIntensity, vmax = self.MaxIntensity)
 
 
     # def SliderChanged(self, index, value):

@@ -24,8 +24,10 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.DynamicGraphList=[]
         self.ScrollBarList=[]
         self.SliderListOfLists = []
+        self.SpectroSliderListOfLists = []
         self.SliderList = []
         self.sliderindex = 0
+        self.Spectrosliderindex = 0
         self.tabIndex=0
         self.DynamicGraph=0
         self.Scrollbar=0
@@ -118,7 +120,30 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.SliderListOfLists.append(self.SliderList)
         self.SliderLayout = QtWidgets.QGridLayout(self.addNewTab)
         self.SliderLayout.setHorizontalSpacing(20)
-        self.SliderLayout.setVerticalSpacing(30) 
+        self.SliderLayout.setVerticalSpacing(30)
+
+        self.PanelsLayout = QtWidgets.QVBoxLayout(self.addNewTab)
+        self.PanelsLayout.addWidget(QtWidgets.QLabel("Output Signal Controls"))
+        self.PanelsLayout.addLayout(self.SliderLayout)
+        
+        self.PanelsLayout.addWidget(QtWidgets.QLabel("Spectrogram Controls"))
+        self.SpectroComboBox = QtWidgets.QComboBox()
+        self.SpectroComboBox.addItems(['default', 'plasma', 'inferno', 'magma', 'cividis'])
+        self.SpectroComboBox.currentIndexChanged.connect(lambda: self.SpectroColorChanged())
+        self.PanelsLayout.addWidget(self.SpectroComboBox)
+
+        self.SpectroSliderList = []
+        self.SpectroSliderLayout = QtWidgets.QHBoxLayout()
+        for i in range(2):
+            self.SpectroSliderList.append(QtWidgets.QSlider(QtCore.Qt.Vertical))
+            self.SpectroSliderList[i].setFixedHeight(200)
+            self.SpectroSliderList[i].sliderPressed.connect(lambda: self.SpectroSliderPressed())
+            self.SpectroSliderList[i].sliderReleased.connect(lambda: self.SpectroSliderReleased())
+            self.SpectroSliderList[i].setTickPosition(QtWidgets.QSlider.TicksAbove)
+            self.SpectroSliderList[i].setTickInterval(10)
+            self.SpectroSliderLayout.addWidget(self.SpectroSliderList[i])
+        self.SpectroSliderListOfLists.append(self.SpectroSliderList)
+        self.PanelsLayout.addLayout(self.SpectroSliderLayout)
 
         self.GraphLayout.addWidget(self.DynamicGraphList[self.tabIndex])
         self.GraphLayout.addWidget(self.ScrollBarList[self.tabIndex])
@@ -128,13 +153,26 @@ class ApplicationWindow(QtWidgets.QMainWindow):
             for y in range(5):
                 self.SliderLayout.addWidget(self.SliderList[i], x, y)
                 i+=1
-        self.TabLayout.addLayout(self.SliderLayout)
+        self.TabLayout.addLayout(self.PanelsLayout)
         
         # to be changed
         self.DynamicGraph=self.DynamicGraphList[self.tabIndex]
         self.Scrollbar=self.ScrollBarList[self.tabIndex]
         self.tabIndex += 1
     
+    def SpectroColorChanged(self):
+        self.DynamicGraph.ChangeSpectroColor(self.SpectroComboBox.currentIndex())
+
+    def SpectroSliderReleased(self):
+        for index in range(2):
+            if self.Spectrosliderindex == index:
+                self.DynamicGraph.SpectroSliderChanged(index, self.SpectroSliderList[index].value())
+
+    def SpectroSliderPressed(self):
+        for index in range(2):
+            if self.SpectroSliderList[index].isSliderDown():
+                self.Spectrosliderindex = index
+
     def SliderReleased(self):
         # if self.sliderindex == 0:
         #     self.DynamicGraph.SliderChanged(0, self.SliderList[0].value()*(5/99))
@@ -193,6 +231,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.DynamicGraph = self.DynamicGraphList[self.WindowTab.currentIndex()]
         self.Scrollbar = self.ScrollBarList[self.WindowTab.currentIndex()]
         self.SliderList = self.SliderListOfLists[self.WindowTab.currentIndex()]
+        self.SpectroSliderList = self.SpectroSliderListOfLists[self.WindowTab.currentIndex()]
         
     def ScrollAction(self):
         self.DynamicGraph.ScrollUpdator(self.Scrollbar.value())
