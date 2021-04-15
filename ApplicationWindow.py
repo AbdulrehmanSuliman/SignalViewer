@@ -10,6 +10,11 @@ from reportlab.pdfgen import canvas
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfbase import pdfmetrics
 
+from matplotlib import pyplot as plt
+from scipy.io.wavfile import write
+#from playsound import playsound
+import simpleaudio as sa 
+
 class ApplicationWindow(QtWidgets.QMainWindow):
     def __init__(self):
         QtWidgets.QMainWindow.__init__(self)
@@ -25,7 +30,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.DynamicGraph=0
         self.Scrollbar=0
         self.isFirstTab=True
-
+        
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setWindowTitle("application main window")
 
@@ -61,6 +66,9 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.Toolbar.addSeparator()
         self.Toolbar.addAction(QIcon("image/add to pdf.png"),"Add to PDF", self.AddToPDF)
         self.Toolbar.addAction(QIcon("image/create pdf.png"),"Create PDF", self.CreatePDF)
+        self.Toolbar.addSeparator()
+        self.Toolbar.addAction(QIcon("image/add to pdf.png"),"Testing Signal", self.validationSignal)
+       # self.Toolbar.addAction(QIcon("image/create pdf.png"),"Play sound", self.playAudio)
 
         
         self.main_widget = QtWidgets.QWidget(self)
@@ -80,6 +88,8 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)
 
+        #validation signal
+        
     def fileQuit(self):
         self.close()
 
@@ -294,3 +304,13 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         #     pdf.drawInlineImage(image,imgxcord, imgycord)
 
         # pdf.save()
+
+    def validationSignal(self):
+        self.AddTab()
+        self.Scrollbar.setValue(99)
+        self.DynamicGraph.SetTimeAndMagnitude_Validation()
+        self.DynamicGraph.SetTimer()
+        
+        
+
+    # def playAudio(self):
