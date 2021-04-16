@@ -1,4 +1,7 @@
 from DynamicGraph import MyDynamicMplCanvas
+from DynamicGraph import *
+from matplotlib.backends.backend_pdf import PdfPages 
+
 import numpy as np
 
 from PyQt5 import QtCore, QtWidgets
@@ -13,7 +16,8 @@ from reportlab.pdfbase import pdfmetrics
 from matplotlib import pyplot as plt
 from scipy.io.wavfile import write
 #from playsound import playsound
-import simpleaudio as sa 
+#import simpleaudio as sa 
+
 
 class ApplicationWindow(QtWidgets.QMainWindow):
     def __init__(self):
@@ -32,6 +36,12 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.DynamicGraph=0
         self.Scrollbar=0
         self.isFirstTab=True
+
+        self.xDataToPdf=[]
+        self.xDataToPdfOut=[]
+        self.yDataToPdf=[]
+        self.yDataToPdfOut=[]
+        self.GraphCollection=[]
         
         self.setAttribute(QtCore.Qt.WA_DeleteOnClose)
         self.setWindowTitle("application main window")
@@ -90,8 +100,10 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)
 
+
         #validation signal
         
+   
     def fileQuit(self):
         self.close()
 
@@ -174,26 +186,6 @@ class ApplicationWindow(QtWidgets.QMainWindow):
                 self.Spectrosliderindex = index
 
     def SliderReleased(self):
-        # if self.sliderindex == 0:
-        #     self.DynamicGraph.SliderChanged(0, self.SliderList[0].value()*(5/99))
-        # elif self.sliderindex == 1:
-        #     self.DynamicGraph.SliderChanged(1, self.SliderList[1].value()*(5/99))
-        # elif self.sliderindex == 2:
-        #     self.DynamicGraph.SliderChanged(2, self.SliderList[2].value()*(5/99))
-        # elif self.sliderindex == 3:
-        #     self.DynamicGraph.SliderChanged(3, self.SliderList[3].value()*(5/99))
-        # elif self.sliderindex == 4:
-        #     self.DynamicGraph.SliderChanged(4, self.SliderList[4].value()*(5/99))
-        # elif self.sliderindex == 5:
-        #     self.DynamicGraph.SliderChanged(5, self.SliderList[5].value()*(5/99))
-        # elif self.sliderindex == 6:
-        #     self.DynamicGraph.SliderChanged(6, self.SliderList[6].value()*(5/99))
-        # elif self.sliderindex == 7:
-        #     self.DynamicGraph.SliderChanged(7, self.SliderList[7].value()*(5/99))
-        # elif self.sliderindex == 8:
-        #     self.DynamicGraph.SliderChanged(8, self.SliderList[8].value()*(5/99))
-        # elif self.sliderindex == 9:
-        #     self.DynamicGraph.SliderChanged(9, self.SliderList[9].value()*(5/99))
         for index in range(10):
             if self.sliderindex == index:
                 self.DynamicGraph.SliderChanged(index, self.SliderList[index].value()*(5/99))
@@ -201,27 +193,6 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         
 
     def SliderPressed(self):    
-        # if self.SliderList[0].isSliderDown():
-        #     self.sliderindex = 0
-        # elif self.SliderList[1].isSliderDown():
-        #     self.sliderindex = 1
-        # elif self.SliderList[2].isSliderDown():
-        #     self.sliderindex = 2
-        # elif self.SliderList[3].isSliderDown():
-        #     self.sliderindex = 3
-        # elif self.SliderList[4].isSliderDown():
-        #     self.sliderindex = 4
-        # elif self.SliderList[5].isSliderDown():
-        #     self.sliderindex = 5
-        # elif self.SliderList[6].isSliderDown():
-        #     self.sliderindex = 6
-        # elif self.SliderList[7].isSliderDown():
-        #     self.sliderindex = 7
-        # elif self.SliderList[8].isSliderDown():
-        #     self.sliderindex = 8
-        # elif self.SliderList[9].isSliderDown():
-        #     self.sliderindex = 9
-
         for index in range(10):
             if self.SliderList[index].isSliderDown():
                 self.sliderindex = index
@@ -296,53 +267,47 @@ class ApplicationWindow(QtWidgets.QMainWindow):
     
     def GetGraphsInPDF(self):
         return self.GraphsInPDF
-    
-    def AddToPDF(self):
 
-        self.DynamicGraph.AddToPDF()
-        # screen=QtWidgets.QApplication.primaryScreen()
-        # screenshot=screen.grabWindow(self.winId())
-        # screenshot.save('photo.jpg','jpg')
-        # im = Image.open("photo.jpg")
-        # width, height = im.size
-        # left = 15
-        # top = height/5
-        # right = 820
-        # bottom = 3.75 * height / 4
-        # im1 = im.crop((left, top, right, bottom))
-        # newsize = (400, 220)
-        # im1 = im1.resize(newsize)
-        # if self.GraphsInPDF == 0:
-        #     imagedata = [im1, 70, 490, 70,720,self.fname]
-        #     self.ImageList.append(imagedata)
-        # elif self.GraphsInPDF == 1:
-        #     imagedata = [im1,70, 245, 70, 470, self.fname]
-        #     self.ImageList.append(imagedata)
-        # elif self.GraphsInPDF == 2:
-        #     imagedata = [im1,70, 0, 70, 230, self.fname]
-        #     self.ImageList.append(imagedata)
+    def GetTabs(self):
+        return self.WindowTab.count()
         
-        # self.GraphsInPDF+=1
+    def AddToPDF(self):
+       
+        
+        self.xDataToPdf.append(self.DynamicGraph.GetxDataPdf())
+        self.xDataToPdfOut.append(self.DynamicGraph.GetxDataPdfOutput())
+        self.yDataToPdf.append(self.DynamicGraph.GetyDataPdf())
+        self.yDataToPdfOut.append(self.DynamicGraph.GetyDataPdfOutput())
+        print(self.yDataToPdfOut)
+
+        for i in range(len(self.yDataToPdfOut)):
+            if i ==len(self.yDataToPdfOut)-1:
+                self.fig=plt.figure()
+                self.fig,self.axs=plt.subplots(3)
+                self.fig.suptitle('Signal '+ str(self.GraphsInPDF))
+                self.axs[0].plot( self.xDataToPdf[i],self.yDataToPdf[i] , '#9e4bae')
+                self.axs[0].grid(color = "#dccbcf", linewidth = 2)
+                self.axs[1].plot( self.xDataToPdfOut[i],self.yDataToPdfOut[i], '#9e4bae')
+                self.axs[1].grid(color = "#dccbcf", linewidth = 2)
+                self.axs[2].specgram(self.DynamicGraph.GetSpectroDataPdf(), Fs=1, cmap=self.DynamicGraph.GetspectroColor(),vmin = self.DynamicGraph.GetMinIntensity(), vmax = self.DynamicGraph.GetMaxIntensity())
+                self.GraphCollection.append(self.fig)
+
+
+    
+
 
         
         
     def CreatePDF(self):
-         self.DynamicGraph.CreatePDF()
-        # fileName = 'Report.pdf'
-        # documentTitle = 'Report'
-        # pdf = canvas.Canvas(fileName)
-        # pdf.setTitle(documentTitle)
-        # pdfmetrics.registerFont( TTFont('abc', 'SakBunderan.ttf') )
-        # pdf.setFont('abc', 36)
-        # pdf.drawCentredString(300, 770, 'Report')   #title
+        pdf= matplotlib.backends.backend_pdf.PdfPages("Output.pdf")
+        self.AddToPDF()
+        for index in range(self.GraphsInPDF):
+        
+            print("innnn")
+            pdf.savefig(self.GraphCollection[index])
+            
 
-        # for image,imgxcord,imgycord, namexcord, nameycord,GraphName in self.ImageList:  
-        #     pdf.setFillColorRGB(0, 0, 0)    #subtitle
-        #     pdf.setFont("Courier-Bold", 14)
-        #     pdf.drawString(namexcord, nameycord, GraphName)
-        #     pdf.drawInlineImage(image,imgxcord, imgycord)
-
-        # pdf.save()
+        pdf.close()
 
     def validationSignal(self):
         self.AddTab()
