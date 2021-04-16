@@ -59,21 +59,14 @@ class MyDynamicMplCanvas(MyMplCanvas):
         #self.val0=self.val1=self.val2=self.val3=self.val4=self.val5=self.val6=self.val7=self.val8=self.val9=0
         self.FTOfMagnitude=np.array([])
         # validation signal
-        self.SAMPLE_RATE = 44100  # Hertz
-<<<<<<< HEAD
-        self.DURATION = 10  # Seconds
-        self.validation_signal=[]
-        #self.generate_sine_wave(1,1,2)
-        self.generate_Validation_Signal()
-    def GetspectroColor(self):
-        return self.SpectroColor             
-=======
+        self.SAMPLE_RATE = 44100  # Hertz    
         # self.DURATION = 10  # Seconds
         # self.validation_signal=[]
         # #self.generate_sine_wave(1,1,2)
         # self.generate_Validation_Signal()
                 
->>>>>>> aefc6a3d9a936f2c956ac9041b7feede41a91a24
+    def GetspectroColor(self):
+        return self.SpectroColor             
 
     # def generate_sine_wave(self,freq, sample_rate, duration):
     
@@ -147,10 +140,6 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.MaxMagnitudeOutput = max(self.MagnitudeOutput)
         self.MinMagnitudeOutput = min(self.MagnitudeOutput)
         
-<<<<<<< HEAD
-        self.GraphNumber+=1
-        #print(self.GraphNumber)
-
 
         
     def SetTimeAndMagnitude_Validation(self):
@@ -171,8 +160,6 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.MaxMagnitudeOutput = max(self.MagnitudeOutput)
         self.MinMagnitudeOutput = min(self.MagnitudeOutput)
         
-=======
->>>>>>> aefc6a3d9a936f2c956ac9041b7feede41a91a24
         
         
 
@@ -209,28 +196,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
             self.Output.plot(self.TimeOutput[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], self.MagnitudeOutput[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], '#9e4bae')
             self.Output.grid(color = "#dccbcf", linewidth = 2)
         
-        # if self.GraphNumber==1:
-        #     self.xDataToPdf[0]=self.Time[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages]
-        #     self.xDataToPdfOut[0]=self.TimeOutput[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages]
-        #     self.yDataToPdf[0]=self.Magnitude[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages]
-        #     self.yDataToPdfOut[0]=self.MagnitudeOutput[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages]
-        # elif self.GraphNumber==2:
-        #     self.xDataToPdf[1]=self.Time[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages]
-        #     self.xDataToPdfOut[1]=self.TimeOutput[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages]
-        #     self.yDataToPdf[1]=self.Magnitude[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages]
-        #     self.yDataToPdfOut[1]=self.MagnitudeOutput[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages]
-        # elif self.GraphNumber==3:
-        #     self.xDataToPdf[2]=self.Time[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages]
-        #     self.xDataToPdfOut[2]=self.TimeOutput[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages]
-        #     self.yDataToPdf[2]=self.Magnitude[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages]
-        #     self.yDataToPdfOut[2]=self.MagnitudeOutput[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages]
-        # for index in range(len(self.xDataToPdf)):
-        #     if index == len(self.xDataToPdf)-1:
-        #         self.xDataToPdf[index]=self.Time[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages]
-        #         self.xDataToPdfOut[index]=self.TimeOutput[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages]
-        #         self.yDataToPdf[index]=self.Magnitude[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages]
-        #         self.yDataToPdfOut[index]=self.MagnitudeOutput[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages]
-
+       
 
 
 
@@ -347,31 +313,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
             self.scrollDisplacement = -newDisplacement
     
     
-    #def AddToPDF(self):
-        # self.fig=plt.figure()
-        # self.fig,self.axs=plt.subplots(3)
-        # for index in range(self.GraphNumber):
-        #     if index == self.GraphNumber-1:
-        #         self.fig.suptitle('Signal '+ str(self.GraphNumber))
-        #         self.axs[0].plot(self.xDataToPdf[index],self.yDataToPdf[index] , '#9e4bae')
-        #         self.axs[0].grid(color = "#dccbcf", linewidth = 2)
-        #         self.axs[1].plot(self.xDataToPdfOut[index],self.yDataToPdfOut[index], '#9e4bae')
-        #         self.axs[1].grid(color = "#dccbcf", linewidth = 2)
-        #         self.axs[2].specgram(self.MagnitudeOutput, Fs=1)
-        #         print("in the for loop if the pdf isa")
-        #         return self.fig
-    
-#    def CreatePDF(self):
-        # pdf= matplotlib.backends.backend_pdf.PdfPages("Output.pdf")
-        # for index in range(self.GraphNumber):
-        #     if index==self.GraphNumber-1:
-        #         self.GraphCollection[index]=self.AddToPDF()
-        #         pdf.savefig(self.GraphCollection[index])
-
-        # # graph1=self.AddToPDF()
-        # # pdf.savefig(graph1)
-        # pdf.close()
-
+   
 
 
 

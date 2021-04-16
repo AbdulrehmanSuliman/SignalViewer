@@ -16,7 +16,7 @@ from reportlab.pdfbase import pdfmetrics
 from matplotlib import pyplot as plt
 from scipy.io.wavfile import write
 #from playsound import playsound
-#import simpleaudio as sa 
+import simpleaudio as sa 
 
 
 class ApplicationWindow(QtWidgets.QMainWindow):
