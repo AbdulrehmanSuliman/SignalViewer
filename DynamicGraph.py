@@ -9,6 +9,8 @@ from math import ceil
 from scipy.fftpack import fft
 from scipy.fftpack import rfft, rfftfreq ,irfft
 import numpy as np
+from scipy.io.wavfile import write
+import simpleaudio as sa
 
 class MyMplCanvas(FigureCanvas):
 
@@ -58,29 +60,37 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.FTOfMagnitude=np.array([])
         # validation signal
         self.SAMPLE_RATE = 44100  # Hertz
+<<<<<<< HEAD
         self.DURATION = 10  # Seconds
         self.validation_signal=[]
         #self.generate_sine_wave(1,1,2)
         self.generate_Validation_Signal()
     def GetspectroColor(self):
         return self.SpectroColor             
+=======
+        # self.DURATION = 10  # Seconds
+        # self.validation_signal=[]
+        # #self.generate_sine_wave(1,1,2)
+        # self.generate_Validation_Signal()
+                
+>>>>>>> aefc6a3d9a936f2c956ac9041b7feede41a91a24
 
-    def generate_sine_wave(self,freq, sample_rate, duration):
+    # def generate_sine_wave(self,freq, sample_rate, duration):
     
-        x = np.linspace(0, duration, sample_rate * duration, endpoint=False)
-        frequencies = x * freq
-        # 2pi because np.sin takes radians
-        y = np.sin((2 * np.pi) * frequencies)
-        return y
+    #     x = np.linspace(0, duration, sample_rate * duration, endpoint=False)
+    #     frequencies = x * freq
+    #     # 2pi because np.sin takes radians
+    #     y = np.sin((2 * np.pi) * frequencies)
+    #     return y
 
-    def generate_Validation_Signal(self):
-        listOfFrequencies=[200,500,1000,1,5000 , 700 ,10000 , 1500 , 100]
-        mixed_signl=self.generate_sine_wave(10,self.SAMPLE_RATE,self.DURATION)
-        for freq in listOfFrequencies:
-            mixed_signl += self.generate_sine_wave(freq,self.SAMPLE_RATE,self.DURATION)
+    # def generate_Validation_Signal(self):
+    #     listOfFrequencies=[200,500,1000,1,5000 , 700 ,10000 , 1500 , 100]
+    #     mixed_signl=self.generate_sine_wave(10,self.SAMPLE_RATE,self.DURATION)
+    #     for freq in listOfFrequencies:
+    #         mixed_signl += self.generate_sine_wave(freq,self.SAMPLE_RATE,self.DURATION)
 
-        self.validation_signal = np.int16((mixed_signl / mixed_signl.max()) * 5000)
-        print(self.validation_signal)
+    #     self.validation_signal = np.int16((mixed_signl / mixed_signl.max()) * 5000)
+    #     print(self.validation_signal)
 
     
 
@@ -137,6 +147,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.MaxMagnitudeOutput = max(self.MagnitudeOutput)
         self.MinMagnitudeOutput = min(self.MagnitudeOutput)
         
+<<<<<<< HEAD
         self.GraphNumber+=1
         #print(self.GraphNumber)
 
@@ -160,6 +171,8 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.MaxMagnitudeOutput = max(self.MagnitudeOutput)
         self.MinMagnitudeOutput = min(self.MagnitudeOutput)
         
+=======
+>>>>>>> aefc6a3d9a936f2c956ac9041b7feede41a91a24
         
         
 
@@ -302,6 +315,13 @@ class MyDynamicMplCanvas(MyMplCanvas):
             self.Spectro.cla()         
             self.Spectro.specgram(self.MagnitudeOutput, Fs=1, cmap=self.SpectroColor, vmin = self.MinIntensity, vmax = self.MaxIntensity)
 
+    def PlayAudioSignal(self):
+
+        write("mysinewave.wav", self.SAMPLE_RATE, np.int16((self.MagnitudeOutput / self.MagnitudeOutput.max()) * 5000))
+        filename = 'mysinewave.wav'
+        wave_obj = sa.WaveObject.from_wave_file("mysinewave.wav")
+        play_obj = wave_obj.play()
+        play_obj.wait_done()
 
 
 

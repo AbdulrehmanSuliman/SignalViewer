@@ -79,8 +79,8 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.Toolbar.addAction(QIcon("image/add to pdf.png"),"Add to PDF", self.AddToPDF)
         self.Toolbar.addAction(QIcon("image/create pdf.png"),"Create PDF", self.CreatePDF)
         self.Toolbar.addSeparator()
-        self.Toolbar.addAction(QIcon("image/add to pdf.png"),"Testing Signal", self.validationSignal)
-       # self.Toolbar.addAction(QIcon("image/create pdf.png"),"Play sound", self.playAudio)
+        #self.Toolbar.addAction(QIcon("image/add to pdf.png"),"Testing Signal", self.validationSignal)
+        self.Toolbar.addAction(QIcon("image/audio icon.png"),"Play sound", self.playAudio)
 
         
         self.main_widget = QtWidgets.QWidget(self)
@@ -309,12 +309,8 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
         pdf.close()
 
-    def validationSignal(self):
-        self.AddTab()
-        self.Scrollbar.setValue(99)
-        self.DynamicGraph.SetTimeAndMagnitude_Validation()
-        self.DynamicGraph.SetTimer()
-        
+    
         
 
-    # def playAudio(self):
+    def playAudio(self):
+        self.DynamicGraph.PlayAudioSignal()
