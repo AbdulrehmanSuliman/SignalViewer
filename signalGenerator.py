@@ -19,7 +19,6 @@ def generate_sine_wave(freq, sample_rate, duration):
 
 
 listOfFrequencies=[600,1000,2400,2800 , 4200 ,4600 , 8000 , 8400 , 18000 ]
-#listOfFrequencies=[100,8000 ]
 
 mixed_signl=generate_sine_wave(200,SAMPLE_RATE,DURATION)
 for freq in listOfFrequencies:
