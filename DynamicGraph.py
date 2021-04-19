@@ -53,7 +53,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.pageRight= False
         self.pageLeft= False
         self.movePages=0
-        self.val=[0]*10
+        self.val=[1]*10
         self.GraphNumber=0
         self.SpectroColor = 'viridis'
         #self.val0=self.val1=self.val2=self.val3=self.val4=self.val5=self.val6=self.val7=self.val8=self.val9=0
@@ -142,23 +142,23 @@ class MyDynamicMplCanvas(MyMplCanvas):
         
 
         
-    def SetTimeAndMagnitude_Validation(self):
-        self.CountOut = 0
-        self.CountIn = 0
-        self.scrollDisplacement=0
-        self.IsStop=True
-        self.ZoomFactor = 0.05
-        self.IsZoomed=False
-        self.CountRange = 200
-        self.Time = np.linspace(0, self.DURATION, self.SAMPLE_RATE * self.DURATION, endpoint=False)
-        self.Magnitude = self.validation_signal    
-        self.TimeOutput = self.Time
-        self.FTOfMagnitude = rfft(self.Magnitude)
-        self.MagnitudeOutput = self.Magnitude
-        self.MaxMagnitude = max(self.Magnitude)
-        self.MinMagnitude = min(self.Magnitude)
-        self.MaxMagnitudeOutput = max(self.MagnitudeOutput)
-        self.MinMagnitudeOutput = min(self.MagnitudeOutput)
+    # def SetTimeAndMagnitude_Validation(self):
+    #     self.CountOut = 0
+    #     self.CountIn = 0
+    #     self.scrollDisplacement=0
+    #     self.IsStop=True
+    #     self.ZoomFactor = 0.05
+    #     self.IsZoomed=False
+    #     self.CountRange = 200
+    #     self.Time = np.linspace(0, self.DURATION, self.SAMPLE_RATE * self.DURATION, endpoint=False)
+    #     self.Magnitude = self.validation_signal    
+    #     self.TimeOutput = self.Time
+    #     self.FTOfMagnitude = rfft(self.Magnitude)
+    #     self.MagnitudeOutput = self.Magnitude
+    #     self.MaxMagnitude = max(self.Magnitude)
+    #     self.MinMagnitude = min(self.Magnitude)
+    #     self.MaxMagnitudeOutput = max(self.MagnitudeOutput)
+    #     self.MinMagnitudeOutput = min(self.MagnitudeOutput)
         
         
         
@@ -245,11 +245,61 @@ class MyDynamicMplCanvas(MyMplCanvas):
                 self.CountIn = 0 
             self.IsZoomed=False
     
-    def SetSliderValueUp(self,index,value):
-        self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]=self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))] *ceil((value))
+    # def SetSliderValueUp(self,index,value):
+    #     self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]=self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))] *ceil((value))
 
-    def SetSliderValueDown(self,index,value):
-        self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]=self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))] /(ceil((self.val[index]-value+1)))
+    # def SetSliderValueDown(self,index,value):
+    #     self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]=self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))] /(ceil((self.val[index]-value+1)))
+
+    # def SliderChanged(self, index, value):
+    #     if len(self.Magnitude) > 0:
+    #         for i in range(10):
+    #             if i==index:
+    #                 if value>self.val[i]:
+    #                     self.SetSliderValueUp(index,value)
+    #                     self.val[i]=value
+
+
+    #                 elif value<self.val[i] and value!=0:
+    #                     self.SetSliderValueDown(index,value)
+    #                     self.val[i]=value
+    #                 elif value == 0:
+    #                     self.SetSliderValueUp(index,value)
+    #                     self.val[i]=value
+
+    #         self.MagnitudeOutput = irfft(self.FTOfMagnitude)
+    #         self.MaxMagnitudeOutput = max(self.MagnitudeOutput)
+    #         self.MinMagnitudeOutput = min(self.MagnitudeOutput)
+    #         self.Spectro.cla()         
+    #         self.Spectro.specgram(self.MagnitudeOutput, Fs=1, cmap=self.SpectroColor, vmin = self.MinIntensity, vmax = self.MaxIntensity)
+
+    def SliderChanged(self, index, value):
+        if len(self.Magnitude) > 0:
+            for i in range(10):
+                if i==index:
+                    if self.val[i] == 0:
+                        self.FTOfMagnitude =np.abs( rfft(self.Magnitude))
+
+                        for index in range(10):
+                            if index == i :
+                                self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]=self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]  * value
+                            else :
+                                self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]=self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]  * self.val[index]
+                                
+                    else :
+                        print(self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))])
+                        
+                        self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]=self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))] / self.val[i] * value
+                        print(self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))])
+   
+                    self.val[i]=value
+                    print(i,self.val[i], value)
+            self.MagnitudeOutput =-irfft(self.FTOfMagnitude)
+            self.MaxMagnitudeOutput = max(self.MagnitudeOutput)
+            self.MinMagnitudeOutput = min(self.MagnitudeOutput)
+            self.Spectro.cla()         
+            self.Spectro.specgram(self.MagnitudeOutput, Fs=1, cmap=self.SpectroColor, vmin = self.MinIntensity, vmax = self.MaxIntensity)
+        
 
     def SpectroSliderChanged(self, index, value):
         if index==0:
@@ -264,27 +314,10 @@ class MyDynamicMplCanvas(MyMplCanvas):
     def GetMaxIntensity(self):
         return self.MaxIntensity
 
-    def SliderChanged(self, index, value):
-        if len(self.Magnitude) > 0:
-            for i in range(10):
-                if i==index:
-                    if value>self.val[i]:
-                        self.SetSliderValueUp(index,value)
-                        self.val[i]=value
-                    elif value<self.val[i] and value!=0:
-                        self.SetSliderValueDown(index,value)
-                        self.val[i]=value
-
-            self.MagnitudeOutput = irfft(self.FTOfMagnitude)
-            self.MaxMagnitudeOutput = max(self.MagnitudeOutput)
-            self.MinMagnitudeOutput = min(self.MagnitudeOutput)
-            self.Spectro.cla()         
-            self.Spectro.specgram(self.MagnitudeOutput, Fs=1, cmap=self.SpectroColor, vmin = self.MinIntensity, vmax = self.MaxIntensity)
 
     def PlayAudioSignal(self):
 
         write("mysinewave.wav", self.SAMPLE_RATE, np.int16((self.MagnitudeOutput / self.MagnitudeOutput.max()) * 5000))
-        filename = 'mysinewave.wav'
         wave_obj = sa.WaveObject.from_wave_file("mysinewave.wav")
         play_obj = wave_obj.play()
         play_obj.wait_done()
