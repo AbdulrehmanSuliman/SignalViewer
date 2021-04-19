@@ -98,7 +98,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
         timer.start(1)
         self.Spectro.cla()         
         self.Spectro.specgram(self.MagnitudeOutput, Fs=1, cmap=self.SpectroColor)
-        x1,x2,y1,y2 = self.Spectro.axis()
+        self.x1,self.x2,y1,y2 = self.Spectro.axis()
         self.YMax = y2
         self.MinIntensity = 0
         self.MaxIntensity = y2 
@@ -186,7 +186,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
             self.SpectroColor = 'cividis'
         self.Spectro.cla()         
         self.Spectro.specgram(self.MagnitudeOutput, Fs=1, cmap=self.SpectroColor)    
-        self.Spectro.axis([x1,x2,self.MinIntensity,self.MaxIntensity])
+        self.Spectro.axis([self.x1,self.x2,self.MinIntensity,self.MaxIntensity])
         
 
 
@@ -226,18 +226,17 @@ class MyDynamicMplCanvas(MyMplCanvas):
             self.MinMagnitudeOutput = min(self.MagnitudeOutput)
             self.Spectro.cla()         
             self.Spectro.specgram(self.MagnitudeOutput, Fs=1, cmap=self.SpectroColor)    
-            self.Spectro.axis([x1,x2,self.MinIntensity,self.MaxIntensity])
+            self.Spectro.axis([self.x1,self.x2,self.MinIntensity,self.MaxIntensity])
         
 
     def SpectroSliderChanged(self, index, value):
-        x1,x2,y1,y2 = self.Spectro.axis()
         if index==0:
             self.MinIntensity = (((self.YMax/2)-0.01)/99)*value
         if index==1:
             self.MaxIntensity = (((self.YMax/2)-0.01)/99)*value + self.YMax/2
         self.Spectro.cla()         
         self.Spectro.specgram(self.MagnitudeOutput, Fs=1, cmap=self.SpectroColor)    
-        self.Spectro.axis([x1,x2,self.MinIntensity,self.MaxIntensity])
+        self.Spectro.axis([self.x1,self.x2,self.MinIntensity,self.MaxIntensity])
     
     def GetMinIntensity(self):
         return self.MinIntensity
