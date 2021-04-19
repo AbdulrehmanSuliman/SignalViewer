@@ -232,8 +232,13 @@ class MyDynamicMplCanvas(MyMplCanvas):
     def SpectroSliderChanged(self, index, value):
         if index==0:
             self.MinIntensity = (((self.YMax/2)-0.01)/99)*value
+            freqmin=ceil((len(self.FTOfMagnitude)/2*value)/99)
         if index==1:
             self.MaxIntensity = (((self.YMax/2)-0.01)/99)*value + self.YMax/2
+            freqmax=ceil(((len(self.FTOfMagnitude)/2*value)/99)+len(self.FTOfMagnitude)/2)
+        newFt=self.FTOfMagnitude[freqmin:freqmax]
+
+        newmag=-irfft(newFt)
         self.Spectro.cla()         
         self.Spectro.specgram(self.MagnitudeOutput, Fs=1, cmap=self.SpectroColor)    
         self.Spectro.axis([self.x1,self.x2,self.MinIntensity,self.MaxIntensity])
