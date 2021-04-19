@@ -154,6 +154,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
             self.SpectroSliderList[i].setTickPosition(QtWidgets.QSlider.TicksAbove)
             self.SpectroSliderList[i].setTickInterval(10)
             self.SpectroSliderLayout.addWidget(self.SpectroSliderList[i])
+        self.SpectroSliderList[1].setValue(99)
         self.SpectroSliderListOfLists.append(self.SpectroSliderList)
         self.PanelsLayout.addLayout(self.SpectroSliderLayout)
 
