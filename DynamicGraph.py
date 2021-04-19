@@ -133,7 +133,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.Time = time
         self.Magnitude = magnitude    
         self.TimeOutput = time
-        self.FTOfMagnitude = rfft(self.Magnitude)
+        self.FTOfMagnitude =np.abs( rfft(self.Magnitude))
         self.MagnitudeOutput = magnitude
         self.MaxMagnitude = max(self.Magnitude)
         self.MinMagnitude = min(self.Magnitude)
