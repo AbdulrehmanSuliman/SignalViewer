@@ -49,7 +49,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.scrollDisplacement=0
         self.scrollBarValue=99
         self.MaxIntensity = 0
-        self.MinIntensity = -100
+        self.MinIntensity = 0
         self.pageRight= False
         self.pageLeft= False
         self.movePages=0
@@ -97,7 +97,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
         timer.timeout.connect(self.update_figure)
         timer.start(1)
         self.Spectro.cla()         
-        self.Spectro.specgram(self.MagnitudeOutput, Fs=1, cmap=self.SpectroColor, vmin = self.MinIntensity, vmax = self.MaxIntensity)
+        self.Spectro.specgram(self.MagnitudeOutput[self.MinIntensity:self.MaxIntensity], Fs=1, cmap=self.SpectroColor)
 
     def SetTimeAndMagnitude(self, time, magnitude):
         self.CountOut = 0
@@ -112,6 +112,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.TimeOutput = time
         self.FTOfMagnitude =np.abs( rfft(self.Magnitude))
         self.MagnitudeOutput = magnitude
+        self.MaxIntensity = len(self.MagnitudeOutput)
         self.MaxMagnitude = max(self.Magnitude)
         self.MinMagnitude = min(self.Magnitude)
         self.MaxMagnitudeOutput = max(self.MagnitudeOutput)
@@ -187,7 +188,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
         elif index == 4:
             self.SpectroColor = 'cividis'
         self.Spectro.cla()         
-        self.Spectro.specgram(self.MagnitudeOutput, Fs=1, cmap=self.SpectroColor, vmin = self.MinIntensity, vmax = self.MaxIntensity)
+        self.Spectro.specgram(self.MagnitudeOutput[self.MinIntensity:self.MaxIntensity], Fs=1, cmap=self.SpectroColor)
         
 
 
@@ -226,16 +227,16 @@ class MyDynamicMplCanvas(MyMplCanvas):
             self.MaxMagnitudeOutput = max(self.MagnitudeOutput)
             self.MinMagnitudeOutput = min(self.MagnitudeOutput)
             self.Spectro.cla()         
-            self.Spectro.specgram(self.MagnitudeOutput, Fs=1, cmap=self.SpectroColor, vmin = self.MinIntensity, vmax = self.MaxIntensity)
+            self.Spectro.specgram(self.MagnitudeOutput[self.MinIntensity:self.MaxIntensity], Fs=1, cmap=self.SpectroColor)
         
 
     def SpectroSliderChanged(self, index, value):
         if index==0:
-            self.MinIntensity = -value *2
+            self.MinIntensity = int((((len(self.MagnitudeOutput)/2)-1)/99)*value) 
         if index==1:
-            self.MaxIntensity = value *2
+            self.MaxIntensity = int((((len(self.MagnitudeOutput)/2)-1)/99)*value + (len(self.MagnitudeOutput)/2))
         self.Spectro.cla()         
-        self.Spectro.specgram(self.MagnitudeOutput, Fs=1, cmap=self.SpectroColor, vmin = self.MinIntensity, vmax = self.MaxIntensity)
+        self.Spectro.specgram(self.MagnitudeOutput[self.MinIntensity:self.MaxIntensity], Fs=1, cmap=self.SpectroColor)
     def GetMinIntensity(self):
         return self.MinIntensity
     
