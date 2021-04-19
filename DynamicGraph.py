@@ -234,7 +234,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
         #print(x1,x2)
         freqmin = 0
         freqmax = len(self.FTOfMagnitude)-1
-        print(len(self.FTOfMagnitude))
+        #print(len(self.FTOfMagnitude))
         if index==0:
             self.MinIntensity = (((self.YMax/2)-0.01)/99)*value
             freqmin=ceil((len(self.FTOfMagnitude)/2*value)/99)
