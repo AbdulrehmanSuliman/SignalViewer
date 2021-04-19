@@ -192,7 +192,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
         elif index == 4:
             self.SpectroColor = 'cividis'
         self.Spectro.cla()         
-        self.Spectro.specgram(self.MagnitudeOutput, Fs=self.SamplingFreq, cmap=self.SpectroColor) 
+        self.Spectro.specgram(self.MagnitudeOutput, Fs=self.SamplingFreq, cmap=self.SpectroColor, vmin = self.MinIntensity, vmax = self.MaxIntensity) 
         self.Spectro.set_ylim(self.freqmin/4000,self.freqmax/4000)    
    
         #self.Spectro.axis([x1,x2,self.MinIntensity,self.MaxIntensity])
@@ -248,21 +248,28 @@ class MyDynamicMplCanvas(MyMplCanvas):
         #print(len(self.FTOfMagnitude))
         if index==0 :
             #self.MinIntensity = (((self.YMax/2)-0.01)/99)*value
+            self.MinIntensity = -2*value 
+            #self.MaxIntensity = int((((len(self.MagnitudeOutput)/2)-1)/99)*value + (len(self.MagnitudeOutput)/2))
+            print(self.MinIntensity)
             self.freqmin=ceil((len(self.FTOfMagnitude)/2*value)/99)
             
         if index==1 :
             #self.MaxIntensity = (((self.YMax/2)-0.01)/99)*value + self.YMax/2
+            self.MaxIntensity = 2*value
             self.freqmax = ceil(((len(self.FTOfMagnitude)/2*value)/99)+len(self.FTOfMagnitude)/2)
         # newFt = self.FTOfMagnitude[self.freqmin:self.freqmax]
 
         # newmag=-irfft(newFt)
-        self.Spectro.cla()         
-        self.Spectro.specgram(self.MagnitudeOutput, Fs=self.SamplingFreq, cmap=self.SpectroColor)
-        #print(self.freqmin/2000,self.freqmax/4000)
-        #self.Spectro.specgram(self.MagnitudeOutput, Fs=len(self.FTOfMagnitude)/2000, cmap=self.SpectroColor)
-        self.Spectro.set_ylim(self.freqmin/4000,self.freqmax/4000)    
-        # self.Spectro.set_ylim(1.5,19.7)    
-        #self.Spectro.axis([x1,x2,self.MinIntensity,self.MaxIntensity])
+        if(self.MinIntensity<self.MaxIntensity):
+            self.Spectro.cla()         
+            self.Spectro.specgram(self.MagnitudeOutput, Fs=self.SamplingFreq, cmap=self.SpectroColor, vmin = self.MinIntensity, vmax = self.MaxIntensity)
+            #print(self.freqmin/2000,self.freqmax/4000)
+            #self.Spectro.specgram(self.MagnitudeOutput, Fs=len(self.FTOfMagnitude)/2000, cmap=self.SpectroColor)
+            self.Spectro.set_ylim(self.freqmin/4000,self.freqmax/4000)    
+            # self.Spectro.set_ylim(1.5,19.7)    
+            #self.Spectro.axis([x1,x2,self.MinIntensity,self.MaxIntensity])
+        else:
+            pass
     
     def GetMinIntensity(self):
         return self.MinIntensity
