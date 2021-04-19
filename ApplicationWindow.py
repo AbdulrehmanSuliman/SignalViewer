@@ -176,19 +176,18 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.DynamicGraph.ChangeSpectroColor(self.SpectroComboBox.currentIndex())
 
     def SpectroSliderReleased(self):
-        for index in range(2):
-            if self.Spectrosliderindex == index:
-                self.DynamicGraph.SpectroSliderChanged(index, self.SpectroSliderList[index].value())
+        self.DynamicGraph.SpectroSliderChanged(self.Spectrosliderindex, self.SpectroSliderList[self.Spectrosliderindex].value())
+            
 
     def SpectroSliderPressed(self):
         for index in range(2):
             if self.SpectroSliderList[index].isSliderDown():
                 self.Spectrosliderindex = index
+                break
 
     def SliderReleased(self):
-        for index in range(10):
-            if self.sliderindex == index:
-                self.DynamicGraph.SliderChanged(index, self.SliderList[index].value()*(5/99))
+        self.DynamicGraph.SliderChanged(self.sliderindex, self.SliderList[self.sliderindex].value()*(5/99))
+                
 
         
 
@@ -196,6 +195,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         for index in range(10):
             if self.SliderList[index].isSliderDown():
                 self.sliderindex = index
+                break
 
 
     def TabChanged(self):

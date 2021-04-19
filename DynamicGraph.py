@@ -280,17 +280,14 @@ class MyDynamicMplCanvas(MyMplCanvas):
                     if self.val[i] == 0:
                         self.FTOfMagnitude =np.abs( rfft(self.Magnitude))
 
-                        for index in range(10):
-                            if index == i :
+                        for counter in range(10):
+                            if counter == i :
                                 self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]=self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]  * value
                             else :
-                                self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]=self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]  * self.val[index]
+                                self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]=self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]  * self.val[counter]
                                 
-                    else :
-                        print(self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))])
-                        
+                    else :                        
                         self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]=self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))] / self.val[i] * value
-                        print(self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))])
    
                     self.val[i]=value
                     print(i,self.val[i], value)
