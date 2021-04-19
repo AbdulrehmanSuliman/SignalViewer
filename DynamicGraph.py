@@ -58,7 +58,9 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.SpectroColor = 'viridis'
         self.FTOfMagnitude=np.array([])
         # validation signal
-        self.SAMPLE_RATE = 44100  # Hertz    
+        self.SAMPLE_RATE = 44100  # Hertz 
+
+          
                
     def GetspectroColor(self):
         return self.SpectroColor             
@@ -97,11 +99,13 @@ class MyDynamicMplCanvas(MyMplCanvas):
         timer.timeout.connect(self.update_figure)
         timer.start(1)
         self.Spectro.cla()         
-        self.Spectro.specgram(self.MagnitudeOutput, Fs=len(self.FTOfMagnitude)/2000, cmap=self.SpectroColor)
-        x1,x2,y1,y2 = self.Spectro.axis()
-        self.YMax = y2
-        self.MinIntensity = 0
-        self.MaxIntensity = y2 
+        self.Spectro.specgram(self.MagnitudeOutput, Fs=self.SamplingFreq, cmap=self.SpectroColor)
+        self.Spectro.set_ylim(self.freqmin/4000,self.freqmax/4000)    
+
+        # x1,x2,y1,y2 = self.Spectro.axis()
+        # self.YMax = y2
+        # self.MinIntensity = 0
+        # self.MaxIntensity = y2 
 
     def SetTimeAndMagnitude(self, time, magnitude):
         self.CountOut = 0
@@ -120,7 +124,10 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.MinMagnitude = min(self.Magnitude)
         self.MaxMagnitudeOutput = max(self.MagnitudeOutput)
         self.MinMagnitudeOutput = min(self.MagnitudeOutput)
-        
+        # min max spectro
+        self.freqmin = 0
+        self.freqmax = len(self.FTOfMagnitude)-1 
+        self.SamplingFreq = len(self.FTOfMagnitude)/2000
 
         
         
@@ -185,8 +192,10 @@ class MyDynamicMplCanvas(MyMplCanvas):
         elif index == 4:
             self.SpectroColor = 'cividis'
         self.Spectro.cla()         
-        self.Spectro.specgram(self.MagnitudeOutput, Fs=len(self.FTOfMagnitude)/2000, cmap=self.SpectroColor)    
-        self.Spectro.axis([x1,x2,self.MinIntensity,self.MaxIntensity])
+        self.Spectro.specgram(self.MagnitudeOutput, Fs=self.SamplingFreq, cmap=self.SpectroColor) 
+        self.Spectro.set_ylim(self.freqmin/4000,self.freqmax/4000)    
+   
+        #self.Spectro.axis([x1,x2,self.MinIntensity,self.MaxIntensity])
         
 
 
@@ -221,31 +230,38 @@ class MyDynamicMplCanvas(MyMplCanvas):
                         self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]=self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))] / self.val[i] * value
    
                     self.val[i]=value
-            self.MagnitudeOutput =-irfft(self.FTOfMagnitude)
+            self.MagnitudeOutput =-irfft(self.FTOfMagnitude[self.freqmin:self.freqmax])
             self.MaxMagnitudeOutput = max(self.MagnitudeOutput)
             self.MinMagnitudeOutput = min(self.MagnitudeOutput)
             self.Spectro.cla()         
-            self.Spectro.specgram(self.MagnitudeOutput, Fs=len(self.FTOfMagnitude)/2000, cmap=self.SpectroColor)    
-            self.Spectro.axis([x1,x2,self.MinIntensity,self.MaxIntensity])
+            self.Spectro.specgram(self.MagnitudeOutput, Fs=self.SamplingFreq, cmap=self.SpectroColor)
+            self.Spectro.set_ylim(self.freqmin/4000,self.freqmax/4000)    
+    
+            #self.Spectro.axis([x1,x2,self.MinIntensity,self.MaxIntensity])
         
 
     def SpectroSliderChanged(self, index, value):
-        x1,x2,y1,y2 = self.Spectro.axis()
+        #x1,x2,y1,y2 = self.Spectro.axis()
         #print(x1,x2)
-        freqmin = 0
-        freqmax = len(self.FTOfMagnitude)-1
+        # st=0
+        # end=len(self.FTOfMagnitude)/4000
         #print(len(self.FTOfMagnitude))
-        if index==0:
-            self.MinIntensity = (((self.YMax/2)-0.01)/99)*value
-            freqmin=ceil((len(self.FTOfMagnitude)/2*value)/99)
-        if index==1:
-            self.MaxIntensity = (((self.YMax/2)-0.01)/99)*value + self.YMax/2
-            freqmax=ceil(((len(self.FTOfMagnitude)/2*value)/99)+len(self.FTOfMagnitude)/2)
-        newFt=self.FTOfMagnitude[freqmin:freqmax]
+        if index==0 :
+            #self.MinIntensity = (((self.YMax/2)-0.01)/99)*value
+            self.freqmin=ceil((len(self.FTOfMagnitude)/2*value)/99)
+            
+        if index==1 :
+            #self.MaxIntensity = (((self.YMax/2)-0.01)/99)*value + self.YMax/2
+            self.freqmax = ceil(((len(self.FTOfMagnitude)/2*value)/99)+len(self.FTOfMagnitude)/2)
+        # newFt = self.FTOfMagnitude[self.freqmin:self.freqmax]
 
-        newmag=-irfft(newFt)
+        # newmag=-irfft(newFt)
         self.Spectro.cla()         
-        self.Spectro.specgram(newmag, Fs=len(newFt)/2000, cmap=self.SpectroColor)    
+        self.Spectro.specgram(self.MagnitudeOutput, Fs=self.SamplingFreq, cmap=self.SpectroColor)
+        #print(self.freqmin/2000,self.freqmax/4000)
+        #self.Spectro.specgram(self.MagnitudeOutput, Fs=len(self.FTOfMagnitude)/2000, cmap=self.SpectroColor)
+        self.Spectro.set_ylim(self.freqmin/4000,self.freqmax/4000)    
+        # self.Spectro.set_ylim(1.5,19.7)    
         #self.Spectro.axis([x1,x2,self.MinIntensity,self.MaxIntensity])
     
     def GetMinIntensity(self):
