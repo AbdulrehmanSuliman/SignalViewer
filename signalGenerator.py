@@ -32,16 +32,4 @@ for i in range(len(normalized_tone)):
 
 sigfile.close()
 
-# Time,trash, Magnitude = np.loadtxt("Signals/Validation.txt",unpack=True)
-# print(normalized_tone)
-# Magnitude2 = np.int16((Magnitude / Magnitude.max()) * 5000)
-# print(Magnitude)
-# for i in Magnitude:
-#     i=int(i)
-# print(Magnitude.astype(int))
 
-# write("mysinewave.wav", SAMPLE_RATE, Magnitude2)
-# filename = 'mysinewave.wav'
-# wave_obj = sa.WaveObject.from_wave_file("mysinewave.wav")
-# play_obj = wave_obj.play()
-# play_obj.wait_done()

@@ -278,7 +278,6 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.xDataToPdfOut.append(self.DynamicGraph.GetxDataPdfOutput())
         self.yDataToPdf.append(self.DynamicGraph.GetyDataPdf())
         self.yDataToPdfOut.append(self.DynamicGraph.GetyDataPdfOutput())
-        print(self.yDataToPdfOut)
 
         for i in range(len(self.yDataToPdfOut)):
             if i ==len(self.yDataToPdfOut)-1:
@@ -303,7 +302,6 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.AddToPDF()
         for index in range(self.GraphsInPDF):
         
-            print("innnn")
             pdf.savefig(self.GraphCollection[index])
             
 

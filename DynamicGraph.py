@@ -56,36 +56,13 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.val=[1]*10
         self.GraphNumber=0
         self.SpectroColor = 'viridis'
-        #self.val0=self.val1=self.val2=self.val3=self.val4=self.val5=self.val6=self.val7=self.val8=self.val9=0
         self.FTOfMagnitude=np.array([])
         # validation signal
         self.SAMPLE_RATE = 44100  # Hertz    
-        # self.DURATION = 10  # Seconds
-        # self.validation_signal=[]
-        # #self.generate_sine_wave(1,1,2)
-        # self.generate_Validation_Signal()
-                
+               
     def GetspectroColor(self):
         return self.SpectroColor             
 
-    # def generate_sine_wave(self,freq, sample_rate, duration):
-    
-    #     x = np.linspace(0, duration, sample_rate * duration, endpoint=False)
-    #     frequencies = x * freq
-    #     # 2pi because np.sin takes radians
-    #     y = np.sin((2 * np.pi) * frequencies)
-    #     return y
-
-    # def generate_Validation_Signal(self):
-    #     listOfFrequencies=[200,500,1000,1,5000 , 700 ,10000 , 1500 , 100]
-    #     mixed_signl=self.generate_sine_wave(10,self.SAMPLE_RATE,self.DURATION)
-    #     for freq in listOfFrequencies:
-    #         mixed_signl += self.generate_sine_wave(freq,self.SAMPLE_RATE,self.DURATION)
-
-    #     self.validation_signal = np.int16((mixed_signl / mixed_signl.max()) * 5000)
-    #     print(self.validation_signal)
-
-    
 
     def SetIsStop(self):
         if self.IsStop:   
@@ -142,26 +119,8 @@ class MyDynamicMplCanvas(MyMplCanvas):
         
 
         
-    # def SetTimeAndMagnitude_Validation(self):
-    #     self.CountOut = 0
-    #     self.CountIn = 0
-    #     self.scrollDisplacement=0
-    #     self.IsStop=True
-    #     self.ZoomFactor = 0.05
-    #     self.IsZoomed=False
-    #     self.CountRange = 200
-    #     self.Time = np.linspace(0, self.DURATION, self.SAMPLE_RATE * self.DURATION, endpoint=False)
-    #     self.Magnitude = self.validation_signal    
-    #     self.TimeOutput = self.Time
-    #     self.FTOfMagnitude = rfft(self.Magnitude)
-    #     self.MagnitudeOutput = self.Magnitude
-    #     self.MaxMagnitude = max(self.Magnitude)
-    #     self.MinMagnitude = min(self.Magnitude)
-    #     self.MaxMagnitudeOutput = max(self.MagnitudeOutput)
-    #     self.MinMagnitudeOutput = min(self.MagnitudeOutput)
         
-        
-        
+            
 
     def update_figure(self):
         self.Input.cla()
@@ -245,34 +204,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
                 self.CountIn = 0 
             self.IsZoomed=False
     
-    # def SetSliderValueUp(self,index,value):
-    #     self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]=self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))] *ceil((value))
-
-    # def SetSliderValueDown(self,index,value):
-    #     self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]=self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))] /(ceil((self.val[index]-value+1)))
-
-    # def SliderChanged(self, index, value):
-    #     if len(self.Magnitude) > 0:
-    #         for i in range(10):
-    #             if i==index:
-    #                 if value>self.val[i]:
-    #                     self.SetSliderValueUp(index,value)
-    #                     self.val[i]=value
-
-
-    #                 elif value<self.val[i] and value!=0:
-    #                     self.SetSliderValueDown(index,value)
-    #                     self.val[i]=value
-    #                 elif value == 0:
-    #                     self.SetSliderValueUp(index,value)
-    #                     self.val[i]=value
-
-    #         self.MagnitudeOutput = irfft(self.FTOfMagnitude)
-    #         self.MaxMagnitudeOutput = max(self.MagnitudeOutput)
-    #         self.MinMagnitudeOutput = min(self.MagnitudeOutput)
-    #         self.Spectro.cla()         
-    #         self.Spectro.specgram(self.MagnitudeOutput, Fs=1, cmap=self.SpectroColor, vmin = self.MinIntensity, vmax = self.MaxIntensity)
-
+  
     def SliderChanged(self, index, value):
         if len(self.Magnitude) > 0:
             for i in range(10):
@@ -290,7 +222,6 @@ class MyDynamicMplCanvas(MyMplCanvas):
                         self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))]=self.FTOfMagnitude[ceil((index/10)*len(self.FTOfMagnitude)):ceil(((index+1)/10)*len(self.FTOfMagnitude))] / self.val[i] * value
    
                     self.val[i]=value
-                    print(i,self.val[i], value)
             self.MagnitudeOutput =-irfft(self.FTOfMagnitude)
             self.MaxMagnitudeOutput = max(self.MagnitudeOutput)
             self.MinMagnitudeOutput = min(self.MagnitudeOutput)
@@ -330,13 +261,11 @@ class MyDynamicMplCanvas(MyMplCanvas):
 
     def ScrollUpdator(self, percentage ):
         self.scrollBarValue=percentage
-        #print(self.scrollBarValue)
 
     def Scrolling(self , lastIndexNow):
         newDisplacement=0
         if self.CountOut >=200:
             newDisplacement= self.CountOut-200 - ceil((self.scrollBarValue * (self.CountOut-200))/99)
-            #print(newDisplacement)
 
         
         if self.CountIn-newDisplacement >= 0:
