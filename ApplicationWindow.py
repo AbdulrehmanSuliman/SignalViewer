@@ -29,6 +29,9 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.ScrollBarList=[]
         self.SliderListOfLists = []
         self.SpectroSliderListOfLists = []
+        self.SliderMapperResetList = []
+        self.SliderResetListOfLists = []
+        self.SliderResetList = []
         self.SliderList = []
         self.sliderindex = 0
         self.Spectrosliderindex = 0
@@ -88,8 +91,11 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         Layout = QtWidgets.QVBoxLayout(self.main_widget)
 
         self.Scrollbar = QtWidgets.QScrollBar(QtCore.Qt.Horizontal)
+        self.ResetSignalMapper = QtCore.QSignalMapper() 
         
         self.WindowTab = QtWidgets.QTabWidget()
+        self.WindowTab.setTabsClosable(True)
+        self.WindowTab.tabCloseRequested.connect(self.CloseTab)
         self.AddTab()
         
         self.WindowTab.currentChanged.connect(self.TabChanged)
@@ -107,6 +113,22 @@ class ApplicationWindow(QtWidgets.QMainWindow):
     def fileQuit(self):
         self.close()
 
+    def CloseTab(self, index):
+        # self.DynamicGraph = self.DynamicGraphList[self.WindowTab.currentIndex()]
+        # self.Scrollbar = self.ScrollBarList[self.WindowTab.currentIndex()]
+        # self.SliderList = self.SliderListOfLists[self.WindowTab.currentIndex()]
+        # self.SpectroSliderList = self.SpectroSliderListOfLists[self.WindowTab.currentIndex()]
+        # self.SliderResetList = self.SliderResetListOfLists[self.WindowTab.currentIndex()]
+        # self.ResetSignalMapper = self.SliderMapperResetList[self.WindowTab.currentIndex()]
+        self.DynamicGraphList.pop(index)
+        self.ScrollBarList.pop(index)
+        self.SliderListOfLists.pop(index)
+        self.SpectroSliderListOfLists.pop(index)
+        self.SliderResetListOfLists.pop(index)
+        self.SliderMapperResetList.pop(index)
+        self.WindowTab.removeTab(index)
+        self.TabChanged()
+
     def AddTab(self):
         
         self.addNewTab = QtWidgets.QWidget()
@@ -122,6 +144,8 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.ScrollBarList[self.tabIndex].valueChanged.connect(lambda: self.ScrollAction())
 
         self.SliderList = []
+        self.SliderResetList = []
+        self.ResetSignalMapper = QtCore.QSignalMapper()
         for i in range(10):
             self.SliderList.append(QtWidgets.QSlider(QtCore.Qt.Vertical))
             self.SliderList[i].setValue(20)
@@ -129,10 +153,18 @@ class ApplicationWindow(QtWidgets.QMainWindow):
             self.SliderList[i].sliderReleased.connect(lambda: self.SliderReleased())
             self.SliderList[i].setTickPosition(QtWidgets.QSlider.TicksAbove)
             self.SliderList[i].setTickInterval(10)
+            self.SliderResetList.append(QtWidgets.QPushButton("Reset"))
+            self.SliderResetList[i].setFixedWidth(45)
+            self.SliderResetList[i].clicked.connect(self.ResetSignalMapper.map)
+            self.ResetSignalMapper.setMapping(self.SliderResetList[i], i)
+        self.ResetSignalMapper.mapped.connect(self.ResetButtonClicked)
+        self.SliderMapperResetList.append(self.ResetSignalMapper)
+        self.SliderResetListOfLists.append(self.SliderResetList)
         self.SliderListOfLists.append(self.SliderList)
+
         self.SliderLayout = QtWidgets.QGridLayout(self.addNewTab)
         self.SliderLayout.setHorizontalSpacing(20)
-        self.SliderLayout.setVerticalSpacing(30)
+        #self.SliderLayout.setVerticalSpacing(30)
 
         self.PanelsLayout = QtWidgets.QVBoxLayout(self.addNewTab)
         self.PanelsLayout.addWidget(QtWidgets.QLabel("Output Signal Controls"))
@@ -164,14 +196,20 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         i = 0
         for x in range(2):
             for y in range(5):
-                self.SliderLayout.addWidget(self.SliderList[i], x, y)
+                self.SliderLayout.addWidget(self.SliderList[i], 2*x, y)
+                self.SliderLayout.addWidget(self.SliderResetList[i],2*x+1, y)
                 i+=1
         self.TabLayout.addLayout(self.PanelsLayout)
         
         # to be changed
         self.DynamicGraph=self.DynamicGraphList[self.tabIndex]
         self.Scrollbar=self.ScrollBarList[self.tabIndex]
+        self.WindowTab.setCurrentIndex(self.tabIndex)
         self.tabIndex += 1
+
+    def ResetButtonClicked(self, index):
+        self.SliderList[index].setValue(20)
+        self.DynamicGraph.SliderChanged(index, self.SliderList[index].value()*(5/99))
     
     def SpectroColorChanged(self):
         self.DynamicGraph.ChangeSpectroColor(self.SpectroComboBox.currentIndex())
@@ -204,7 +242,9 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.Scrollbar = self.ScrollBarList[self.WindowTab.currentIndex()]
         self.SliderList = self.SliderListOfLists[self.WindowTab.currentIndex()]
         self.SpectroSliderList = self.SpectroSliderListOfLists[self.WindowTab.currentIndex()]
-        
+        self.SliderResetList = self.SliderResetListOfLists[self.WindowTab.currentIndex()]
+        self.ResetSignalMapper = self.SliderMapperResetList[self.WindowTab.currentIndex()]
+
     def ScrollAction(self):
         self.DynamicGraph.ScrollUpdator(self.Scrollbar.value())
 
