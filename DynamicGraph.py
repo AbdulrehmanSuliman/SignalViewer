@@ -50,8 +50,8 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.scrollBarValue=99
         self.MaxIntensity = 0
         self.MinIntensity = 0
-        self.pageRight= False
-        self.pageLeft= False
+        # self.pageRight= False
+        # self.pageLeft= False
         self.movePages=0
         self.val=[1]*10
         self.GraphNumber=0
@@ -72,27 +72,33 @@ class MyDynamicMplCanvas(MyMplCanvas):
         else:
             self.IsStop=True
 
-    def PauseSignal(self):
-        self.IsStop = False
+    def Pause_Continue_Signal(self,stop):
+        self.IsStop = stop
 
-    def StartSignal(self):
-        self.IsStop = True 
+    # def PauseSignal(self):
+    #     self.IsStop = False
 
-    def SetMovePages(self):
-        if self.pageLeft :
-            self.movePages-=200
-            self.pageLeft =False
-        if self.pageRight:
-            self.movePages+=200
-            self.pageRight=False
+    # def StartSignal(self):
+    #     self.IsStop = True 
+
+    def SetMovePages(self,value):
+        self.movePages+=value
+            
+    # def SetMovePages(self):
+    #     if self.pageLeft :
+    #         self.movePages-=200
+    #         self.pageLeft =False
+    #     if self.pageRight:
+    #         self.movePages+=200
+    #         self.pageRight=False
 
 
 
-    def setpageRight(self):
-        self.pageRight=True
+    # def setpageRight(self):
+    #     self.pageRight=True
 
-    def setpageLeft(self):
-        self.pageLeft=True
+    # def setpageLeft(self):
+    #     self.pageLeft=True
     
     def SetTimer(self):
         timer = QtCore.QTimer(self)
@@ -134,8 +140,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.Input.cla()
         self.Output.cla()
         self.Scrolling(self.CountOut+self.scrollDisplacement)
-        #print(self.scrollDisplacement)
-        self.SetMovePages()
+        #self.SetMovePages("")
         if self.IsStop:
             self.CountOut += 1
             if self.CountOut - self.CountIn >= self.CountRange :
@@ -147,10 +152,7 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.Input.set_ylim(self.MinMagnitude, self.MaxMagnitude)
         self.Output.set_ylim(self.MinMagnitudeOutput, self.MaxMagnitudeOutput)
         if self.CountIn+self.scrollDisplacement+self.movePages>= 0 and self.CountIn+self.scrollDisplacement +self.movePages<= self.CountOut:
-            self.Input.plot(self.Time[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], self.Magnitude[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], '#9e4bae')
-            self.Input.grid(color = "#dccbcf", linewidth = 2)
-            self.Output.plot(self.TimeOutput[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], self.MagnitudeOutput[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], '#9e4bae')
-            self.Output.grid(color = "#dccbcf", linewidth = 2)
+            self.PlotSignal()
             
             
         else:
@@ -158,12 +160,16 @@ class MyDynamicMplCanvas(MyMplCanvas):
                 self.movePages-=200
             if self.movePages<0:
                 self.movePages+=200
-            self.Input.plot(self.Time[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], self.Magnitude[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], '#9e4bae')
-            self.Input.grid(color = "#dccbcf", linewidth = 2)
-            self.Output.plot(self.TimeOutput[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], self.MagnitudeOutput[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], '#9e4bae')
-            self.Output.grid(color = "#dccbcf", linewidth = 2)
+            self.PlotSignal()
 
         self.draw()
+
+
+    def PlotSignal(self):
+        self.Input.plot(self.Time[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], self.Magnitude[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], '#9e4bae')
+        self.Input.grid(color = "#dccbcf", linewidth = 2)
+        self.Output.plot(self.TimeOutput[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], self.MagnitudeOutput[self.CountIn+self.scrollDisplacement+self.movePages:self.CountOut+self.scrollDisplacement+self.movePages], '#9e4bae')
+        self.Output.grid(color = "#dccbcf", linewidth = 2)
 
 
     def GetxDataPdf(self):
@@ -232,29 +238,32 @@ class MyDynamicMplCanvas(MyMplCanvas):
         
 
     def SpectroSliderChanged(self, index, value):
-        #x1,x2,y1,y2 = self.Spectro.axis()
-        #print(x1,x2)
-        # st=0
-        # end=len(self.FTOfMagnitude)/4000
-        #print(len(self.FTOfMagnitude))
         if index==0 :
-            #self.MinIntensity = (((self.YMax/2)-0.01)/99)*value
-            #self.MinIntensity = -2*value 
-            #self.MaxIntensity = int((((len(self.MagnitudeOutput)/2)-1)/99)*value + (len(self.MagnitudeOutput)/2))
-            #print(self.MinIntensity)
             self.freqmin=ceil((len(self.FTOfMagnitude)/2*value)/99)
             
         if index==1 :
-            #self.MaxIntensity = (((self.YMax/2)-0.01)/99)*value + self.YMax/2
-            #self.MaxIntensity = 2*value
             self.freqmax = ceil(((len(self.FTOfMagnitude)/2*value)/99)+len(self.FTOfMagnitude)/2)
+        
+        self.Draw_Spectrogram()
+
+
         # newFt = self.FTOfMagnitude[self.freqmin:self.freqmax]
 
         # newmag=-irfft(newFt)
         # newtry= self.FTOfMagnitude[0:ceil(len(self.FTOfMagnitude)/2)]
         # newnew=-irfft(newtry)
-        
-        self.Draw_Spectrogram()
+            #self.MinIntensity = (((self.YMax/2)-0.01)/99)*value
+            #self.MinIntensity = -2*value 
+            #self.MaxIntensity = int((((len(self.MagnitudeOutput)/2)-1)/99)*value + (len(self.MagnitudeOutput)/2))
+            #print(self.MinIntensity)
+            #self.MaxIntensity = (((self.YMax/2)-0.01)/99)*value + self.YMax/2
+            #self.MaxIntensity = 2*value
+        #x1,x2,y1,y2 = self.Spectro.axis()
+        #print(x1,x2)
+        # st=0
+        # end=len(self.FTOfMagnitude)/4000
+        #print(len(self.FTOfMagnitude))
+
             #print(self.freqmin/2000,self.freqmax/4000)
             # self.Spectro.cla() 
             # self.Spectro.specgram(newmag, Fs=len(newFt)/2000, cmap=self.SpectroColor)
@@ -267,11 +276,11 @@ class MyDynamicMplCanvas(MyMplCanvas):
             #self.Spectro.axis([x1,x2,self.MinIntensity,self.MaxIntensity])
         
     
-    def GetMinIntensity(self):
-        return self.MinIntensity
+    # def GetMinIntensity(self):
+    #     return self.MinIntensity
     
-    def GetMaxIntensity(self):
-        return self.MaxIntensity
+    # def GetMaxIntensity(self):
+    #     return self.MaxIntensity
 
     def Draw_Spectrogram(self):
         self.Spectro.cla()         
