@@ -120,6 +120,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         # self.SpectroSliderList = self.SpectroSliderListOfLists[self.WindowTab.currentIndex()]
         # self.SliderResetList = self.SliderResetListOfLists[self.WindowTab.currentIndex()]
         # self.ResetSignalMapper = self.SliderMapperResetList[self.WindowTab.currentIndex()]
+        self.tabIndex-=1
         self.DynamicGraphList.pop(index)
         self.ScrollBarList.pop(index)
         self.SliderListOfLists.pop(index)
@@ -127,6 +128,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.SliderResetListOfLists.pop(index)
         self.SliderMapperResetList.pop(index)
         self.WindowTab.removeTab(index)
+        #print(self.WindowTab.currentIndex())
         self.TabChanged()
 
     def AddTab(self):
@@ -238,19 +240,24 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
 
     def TabChanged(self):
-        self.DynamicGraph = self.DynamicGraphList[self.WindowTab.currentIndex()]
-        self.Scrollbar = self.ScrollBarList[self.WindowTab.currentIndex()]
-        self.SliderList = self.SliderListOfLists[self.WindowTab.currentIndex()]
-        self.SpectroSliderList = self.SpectroSliderListOfLists[self.WindowTab.currentIndex()]
-        self.SliderResetList = self.SliderResetListOfLists[self.WindowTab.currentIndex()]
-        self.ResetSignalMapper = self.SliderMapperResetList[self.WindowTab.currentIndex()]
+        try:
+            if self.WindowTab.currentIndex() >= 0 and len(self.DynamicGraphList)!=0:
+                self.DynamicGraph = self.DynamicGraphList[self.WindowTab.currentIndex()]
+                self.Scrollbar = self.ScrollBarList[self.WindowTab.currentIndex()]
+                self.SliderList = self.SliderListOfLists[self.WindowTab.currentIndex()]
+                self.SpectroSliderList = self.SpectroSliderListOfLists[self.WindowTab.currentIndex()]
+                self.SliderResetList = self.SliderResetListOfLists[self.WindowTab.currentIndex()]
+                self.ResetSignalMapper = self.SliderMapperResetList[self.WindowTab.currentIndex()]
+        except:
+            print("fra5 m7mara")
+            pass
+
 
     def ScrollAction(self):
         self.DynamicGraph.ScrollUpdator(self.Scrollbar.value())
 
     def SetScrollbar(self, percentage):
         if percentage<0 or percentage>99:
-            print ("Percentage is out of range")
             return
 
         self.Scrollbar.setValue(percentage)
@@ -299,6 +306,8 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         Time,trash, Magnitude = np.loadtxt(path,unpack=True)
         #TimeOutput,trash, MagnitudeOutput = np.loadtxt(path,unpack=True)
         if self.isFirstTab ==False :
+            self.AddTab()
+        if self.WindowTab.currentIndex()<0:
             self.AddTab()
         self.isFirstTab=False
         self.Scrollbar.setValue(99)
