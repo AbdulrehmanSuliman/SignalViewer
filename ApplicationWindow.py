@@ -262,10 +262,10 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.DynamicGraph.SetIsStop()
     
     def Pause(self):
-        self.DynamicGraph.PauseSignal()
+        self.DynamicGraph.Pause_Continue_Signal(False)
     
     def Start(self):
-        self.DynamicGraph.StartSignal()
+        self.DynamicGraph.Pause_Continue_Signal(True)
     
     def ZoomIn(self):
         self.DynamicGraph.SetZoomFactor(True)
@@ -274,9 +274,9 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.DynamicGraph.SetZoomFactor(False)
 
     def MoveRight(self):
-        self.DynamicGraph.setpageRight()
+        self.DynamicGraph.SetMovePages(200)
     def MoveLeft(self):
-        self.DynamicGraph.setpageLeft()
+        self.DynamicGraph.SetMovePages(-200)
     
     def open_dialog_box(self):
         filename = QFileDialog.getOpenFileName()
