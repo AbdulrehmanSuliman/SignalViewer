@@ -5,8 +5,10 @@ from matplotlib.backends.backend_pdf import PdfPages
 import numpy as np
 
 from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QInputDialog, QFileDialog, QApplication
+from PyQt5.QtWidgets import QInputDialog, QFileDialog, QApplication 
 from PyQt5.QtGui import *
+from PyQt5.QtGui import QKeySequence
+from PyQt5.QtWidgets import QApplication, QWidget, QShortcut, QLabel, QHBoxLayout
 
 from PIL import Image
 from reportlab.pdfgen import canvas 
@@ -82,7 +84,6 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.Toolbar.addAction(QIcon("image/add to pdf.png"),"Add to PDF", self.AddToPDF)
         self.Toolbar.addAction(QIcon("image/create pdf.png"),"Create PDF", self.CreatePDF)
         self.Toolbar.addSeparator()
-        #self.Toolbar.addAction(QIcon("image/add to pdf.png"),"Testing Signal", self.validationSignal)
         self.Toolbar.addAction(QIcon("image/audio icon.png"),"Play sound", self.playAudio)
 
         
@@ -99,7 +100,13 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.AddTab()
         
         self.WindowTab.currentChanged.connect(self.TabChanged)
+        self.MoveTabs = QShortcut(QKeySequence('Ctrl+Tab'), self)
+        self.MoveTabs.activated.connect(self.NextTab)
 
+        self.SliderShortCut_P = QShortcut(QKeySequence('Ctrl+['), self)
+        self.SliderShortCut_P.activated.connect(self.SliderPressed)
+        self.SliderShortCut_R = QShortcut(QKeySequence('Ctrl+]'), self)
+        self.SliderShortCut_R.activated.connect(self.SliderReleased)
         Layout.addWidget(self.Toolbar)
         Layout.addWidget(self.WindowTab)
 
@@ -113,13 +120,12 @@ class ApplicationWindow(QtWidgets.QMainWindow):
     def fileQuit(self):
         self.close()
 
+    def NextTab(self):
+        NewIndex=self.WindowTab.currentIndex()
+        print((NewIndex+1)% (self.tabIndex))
+        self.WindowTab.setCurrentIndex((NewIndex+1)% (self.tabIndex))
+
     def CloseTab(self, index):
-        # self.DynamicGraph = self.DynamicGraphList[self.WindowTab.currentIndex()]
-        # self.Scrollbar = self.ScrollBarList[self.WindowTab.currentIndex()]
-        # self.SliderList = self.SliderListOfLists[self.WindowTab.currentIndex()]
-        # self.SpectroSliderList = self.SpectroSliderListOfLists[self.WindowTab.currentIndex()]
-        # self.SliderResetList = self.SliderResetListOfLists[self.WindowTab.currentIndex()]
-        # self.ResetSignalMapper = self.SliderMapperResetList[self.WindowTab.currentIndex()]
         self.tabIndex-=1
         self.DynamicGraphList.pop(index)
         self.ScrollBarList.pop(index)
@@ -128,7 +134,6 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.SliderResetListOfLists.pop(index)
         self.SliderMapperResetList.pop(index)
         self.WindowTab.removeTab(index)
-        #print(self.WindowTab.currentIndex())
         self.TabChanged()
 
     def AddTab(self):
@@ -214,7 +219,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.DynamicGraph.SliderChanged(index, self.SliderList[index].value()*(5/99))
     
     def SpectroColorChanged(self):
-        self.DynamicGraph.ChangeSpectroColor(self.SpectroComboBox.currentIndex())
+        self.DynamicGraph.ChangeSpectroColor(self.SpectroComboBox.currentText())
 
     def SpectroSliderReleased(self):
         self.DynamicGraph.SpectroSliderChanged(self.Spectrosliderindex, self.SpectroSliderList[self.Spectrosliderindex].value())
@@ -227,12 +232,14 @@ class ApplicationWindow(QtWidgets.QMainWindow):
                 break
 
     def SliderReleased(self):
+        print("released")
         self.DynamicGraph.SliderChanged(self.sliderindex, self.SliderList[self.sliderindex].value()*(5/99))
                 
 
         
 
-    def SliderPressed(self):    
+    def SliderPressed(self):
+        print("pressed")    
         for index in range(10):
             if self.SliderList[index].isSliderDown():
                 self.sliderindex = index
@@ -249,9 +256,11 @@ class ApplicationWindow(QtWidgets.QMainWindow):
                 self.SliderResetList = self.SliderResetListOfLists[self.WindowTab.currentIndex()]
                 self.ResetSignalMapper = self.SliderMapperResetList[self.WindowTab.currentIndex()]
         except:
-            print("fra5 m7mara")
+            print("")
             pass
 
+    def stopSignal(self):
+        self.DynamicGraph.SetIsStop()
 
     def ScrollAction(self):
         self.DynamicGraph.ScrollUpdator(self.Scrollbar.value())
@@ -265,8 +274,6 @@ class ApplicationWindow(QtWidgets.QMainWindow):
     def closeEvent(self, ce):
         self.fileQuit()
 
-    def stopSignal(self):
-        self.DynamicGraph.SetIsStop()
     
     def Pause(self):
         self.DynamicGraph.Pause_Continue_Signal(False)
@@ -338,7 +345,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
                 self.axs[0].grid(color = "#dccbcf", linewidth = 2)
                 self.axs[1].plot( self.xDataToPdfOut[i],self.yDataToPdfOut[i], '#9e4bae')
                 self.axs[1].grid(color = "#dccbcf", linewidth = 2)
-                self.axs[2].specgram(self.DynamicGraph.GetSpectroDataPdf(), Fs=1, cmap=self.DynamicGraph.GetspectroColor(),vmin = self.DynamicGraph.GetMinIntensity(), vmax = self.DynamicGraph.GetMaxIntensity())
+                self.axs[2].specgram(self.DynamicGraph.GetSpectroDataPdf(), Fs=1, cmap=self.DynamicGraph.GetspectroColor())
                 self.GraphCollection.append(self.fig)
 
 

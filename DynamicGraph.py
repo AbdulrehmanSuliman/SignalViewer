@@ -107,13 +107,13 @@ class MyDynamicMplCanvas(MyMplCanvas):
         self.Draw_Spectrogram()
 
     def SetTimeAndMagnitude(self, time, magnitude):
-        self.CountOut = 0
-        self.CountIn = 0
-        self.scrollDisplacement=0
-        self.IsStop=True
-        self.ZoomFactor = 0.05
-        self.IsZoomed=False
-        self.CountRange = 200
+        # self.CountOut = 0
+        # self.CountIn = 0
+        # self.scrollDisplacement=0
+        # self.IsStop=True
+        # self.ZoomFactor = 0.05
+        # self.IsZoomed=False
+        # self.CountRange = 200
         self.Time = time
         self.Magnitude = magnitude    
         self.TimeOutput = time
@@ -179,20 +179,14 @@ class MyDynamicMplCanvas(MyMplCanvas):
     def GetSpectroDataPdf(self):
         return self.MagnitudeOutput
 
-    def ChangeSpectroColor(self, index):
-        if index == 0:
-            self.SpectroColor = 'viridis'
-        elif index == 1:
-            self.SpectroColor = 'plasma'
-        elif index == 2:
-            self.SpectroColor = 'inferno'
-        elif index == 3:
-            self.SpectroColor = 'magma'
-        elif index == 4:
-            self.SpectroColor = 'cividis'
-        self.Draw_Spectrogram()
-        
 
+    def ChangeSpectroColor(self, Text):
+        print(str(Text))
+        if str(Text) == 'default':
+            self.SpectroColor = 'viridis'
+        else :
+            self.SpectroColor = str(Text)
+        self.Draw_Spectrogram()
 
 
     def SetZoomFactor(self,zoomed):
@@ -239,42 +233,6 @@ class MyDynamicMplCanvas(MyMplCanvas):
         
         self.Draw_Spectrogram()
 
-
-        # newFt = self.FTOfMagnitude[self.freqmin:self.freqmax]
-
-        # newmag=-irfft(newFt)
-        # newtry= self.FTOfMagnitude[0:ceil(len(self.FTOfMagnitude)/2)]
-        # newnew=-irfft(newtry)
-            #self.MinIntensity = (((self.YMax/2)-0.01)/99)*value
-            #self.MinIntensity = -2*value 
-            #self.MaxIntensity = int((((len(self.MagnitudeOutput)/2)-1)/99)*value + (len(self.MagnitudeOutput)/2))
-            #print(self.MinIntensity)
-            #self.MaxIntensity = (((self.YMax/2)-0.01)/99)*value + self.YMax/2
-            #self.MaxIntensity = 2*value
-        #x1,x2,y1,y2 = self.Spectro.axis()
-        #print(x1,x2)
-        # st=0
-        # end=len(self.FTOfMagnitude)/4000
-        #print(len(self.FTOfMagnitude))
-
-            #print(self.freqmin/2000,self.freqmax/4000)
-            # self.Spectro.cla() 
-            # self.Spectro.specgram(newmag, Fs=len(newFt)/2000, cmap=self.SpectroColor)
-            # self.Spectro.set_ylim(self.freqmin/4000,self.freqmax/4000)
-            # self.Spectro.cla() 
-            # self.Spectro.specgram(newnew, Fs=len(newtry)/2000, cmap=self.SpectroColor)
-            # #self.Spectro.set_ylim(self.freqmin/4000,self.freqmax/4000)
-                
-            # # self.Spectro.set_ylim(1.5,19.7)    
-            #self.Spectro.axis([x1,x2,self.MinIntensity,self.MaxIntensity])
-        
-    
-    # def GetMinIntensity(self):
-    #     return self.MinIntensity
-    
-    # def GetMaxIntensity(self):
-    #     return self.MaxIntensity
-
     def Draw_Spectrogram(self):
         self.Spectro.cla()         
         self.Spectro.specgram(self.MagnitudeOutput, Fs=self.SamplingFreq, cmap=self.SpectroColor)
@@ -299,11 +257,3 @@ class MyDynamicMplCanvas(MyMplCanvas):
         if self.CountIn-newDisplacement >= 0:
             self.scrollDisplacement = -newDisplacement
     
-    
-   
-
-
-
-        
-
-            
